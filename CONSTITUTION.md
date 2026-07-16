@@ -145,12 +145,11 @@ load   : OrderId -> Effect<Order, NotFound>           owns effects
 - DO: invest widest at Composition, anchored by Static Analysis, made honest by Properties.
 - DON'T: build a Test Pyramid; it buries logic in I/O and leaves the untested middle.
 
-|     Width      | Layer                                                                    | What It Catches                         |
-| :------------: | ------------------------------------------------------------------------ | --------------------------------------- |
-|      ████      | **Static Analysis** — type checker, linter, dependency (DAG) checks      | Entire bug classes, zero maintenance    |
-|     ██████     | **Property Tests** — Core invariants, ACL roundtrips, schema conformance | What the system guarantees              |
-| ██████████████ | **Composition Tests** — Mocked I/O, real use cases, error paths          | Real workflows through the I/O sandwich |
-|      ███       | **Contract Tests** — transport schema, CLI output                        | External interface conformance          |
+Width is investment (Composition earns the widest); each layer catches:
+- **Static Analysis** — type checker, linter, dependency (DAG) checks — entire bug classes, zero maintenance
+- **Property Tests** — core invariants, ACL roundtrips, schema conformance — what the system guarantees
+- **Composition Tests** — mocked I/O, real use cases, error paths — real workflows through the I/O sandwich
+- **Contract Tests** — transport schema, CLI output — external interface conformance
 
 **§2. Properties Over Examples.**
 - DO: prove the pure core with property tests; the type is the generator.
