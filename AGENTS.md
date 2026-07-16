@@ -5,12 +5,10 @@ Single source of truth for [`CONSTITUTION.md`](CONSTITUTION.md) — the supreme 
 ## Startup Workflow
 
 Before making changes:
-
 1. **Read this file** completely.
-2. **Read @CONSTITUTION.md** — every directive in there binds this repo too.
-3. **Confirm the active task** with the user or the agent's task list.
-4. **Review recent commits** with `git log --oneline -5`.
-5. **Ensure current branch is not `main`** — feature branches only. If on main, create one.
+2. **Confirm the active task** with the user or the agent's task list.
+3. **Review recent commits** with `git log --oneline -5`.
+4. **Ensure current branch is not `main`** — feature branches only. If on main, create one.
 
 ## Working Rules
 
@@ -76,7 +74,7 @@ Before ending a session:
 
 ## Escalation
 
-- **Constitution conflict**: Consult @CONSTITUTION.md. If letter and purpose diverge, purpose governs.
+- **Constitution interpretation**: If letter and purpose diverge, purpose governs.
 - **Unclear requirements**: Ask the user.
 - **Verification failure**: Record via memory, flag for review, do not bypass.
 - **Scope ambiguity**: Re-read this file and the Definition of Done.

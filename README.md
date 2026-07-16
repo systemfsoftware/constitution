@@ -24,7 +24,6 @@ This repository is the **single source of truth**. [systemfsoftware.com/constitu
 | **III — Verification** | The Testing Trophy; properties over examples; mutation is the measure. |
 | **IV — Organization** | Organized by what it does; names scream the domain; fits in the head. |
 | **V — Conduct** | Depth over expedience; challenge before you commit; subtract before you add. |
-| **VI — Amendment** | How the document changes. |
 
 ## Use it in a repository
 
@@ -57,4 +56,4 @@ git subtree pull --prefix=vendor/constitution refs/remotes/vendor/constitution -
 
 ## Amendment
 
-The constitution is amendable by design (Article VI). An amendment carries a written rationale, a version bump, a date, and a matching update to the consuming `AGENTS.md`.
+The constitution is amendable by design. An amendment carries a written rationale, a version bump, a date, and a matching update to the consuming `AGENTS.md`.
