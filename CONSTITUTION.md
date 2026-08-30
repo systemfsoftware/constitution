@@ -4,6 +4,16 @@
 
 ```yaml
 rules:
+  - id: CONST-G3
+    title: Constitutional Violations Are Automatic P0 Failures
+    gate: review
+    do: treat every violation of this constitution during review as an automatic, non-negotiable P0 failure; reject the change unconditionally with zero appeals, no severity downgrades, and no waivers
+    dont:
+      - downgrade a constitutional breach to an advisory, P1, P2, or non-blocking finding
+      - approve or merge a change while any constitutional rule remains violated
+      - accept a promise of follow-up repair or expedience plea to bypass an active rule
+    harm: constitutional rules decay into optional suggestions; agents negotiate away core architecture to ship faster; unblocked violations calcify into precedent
+    check: review — every constitutional violation is graded P0 and blocks approval unconditionally; any review that waives or downgrades a violation is rejected
   - id: CONST-S1
     title: Depth Over Expedience
     gate: review
