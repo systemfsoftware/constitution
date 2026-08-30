@@ -165,15 +165,15 @@ rules:
 ```yaml
 rules:
   - id: CONST-T8
-    title: Test the Right Thing with the Right Tool
+    title: Test Public Functions Directly, Pure Logic with Mutation
     gate: review
-    do: test each piece of code only through the tool that can catch its bugs — test pure logic with mutation testing (and properties only when CONST-T14 allows them); test whole features by calling exported functions; test glue code only through those exported functions, never with its own unit tests
+    do: test the public API with real inputs and outputs; test internal calculation and branching logic with mutation tests (and properties only when CONST-T14 requires them); never write dedicated unit tests for code that only forwards calls between components
     dont:
-      - write unit tests for glue code that only passes data along — either pull out the decision logic or test it from the outside
-      - put glue code, adapters, or serializers into the same mutation test run as pure logic
-      - mock a dependency when only one real version of it exists
-    harm: tests pass while bugs slip through; mocking glue code tests nothing but wiring; a messy middle layer grows where business rules and I/O stay tangled
-    check: review — every new test names what it tests (pure logic or exported feature) and does not import private functions to assert on them
+      - write unit tests for intermediate helper functions that only pass data to other functions
+      - mix I/O code or adapters into the same mutation test run as pure calculation logic
+      - mock a dependency when only one real implementation exists
+    harm: unit-testing intermediate layers locks in private implementation details without catching real bugs; mocking real code gives false confidence; business rules stay tangled with I/O
+    check: review — every test calls either a public export or a pure decision function, never a private forwarding helper
   - id: CONST-T14
     title: Properties Where the Surface Cannot Reach
     gate: review
