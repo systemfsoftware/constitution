@@ -165,15 +165,15 @@ rules:
 ```yaml
 rules:
   - id: CONST-T8
-    title: The Observer Must See the Fault Class
+    title: Test the Right Thing with the Right Tool
     gate: review
-    do: enroll each behavior in the observer that can see its failure class — a pure decision is read by an observer that can see a wrong tag (mutation of that decision, and a property only when CONST-T14 earns it); a published operation is read by tests that call only exported names; a shell that only translates is read by those exported-name tests, not by a suite of its own
+    do: test each piece of code only through the tool that can catch its bugs — test pure logic with mutation testing (and properties only when CONST-T14 allows them); test whole features by calling exported functions; test glue code only through those exported functions, never with its own unit tests
     dont:
-      - give the orchestrator its own test suite — extract the decision or live with the exported-name test
-      - enroll adapters, codecs, or wiring in the same mutant set as decisions
-      - treat a substitute whose expected value derives from the single implementation it replaces as an observer
-    harm: the wrong instrument reports coverage and measures nothing; mocked composition certifies wiring; a fat middle grows where decisions and I/O stay tangled
-    check: review — every new test names the surface it binds (decision or published export) and does not import a non-exported symbol to assert it
+      - write unit tests for glue code that only passes data along — either pull out the decision logic or test it from the outside
+      - put glue code, adapters, or serializers into the same mutation test run as pure logic
+      - mock a dependency when only one real version of it exists
+    harm: tests pass while bugs slip through; mocking glue code tests nothing but wiring; a messy middle layer grows where business rules and I/O stay tangled
+    check: review — every new test names what it tests (pure logic or exported feature) and does not import private functions to assert on them
   - id: CONST-T14
     title: Properties Where the Surface Cannot Reach
     gate: review
@@ -242,12 +242,12 @@ rules:
     harm: tests that fail on refactors callers cannot see and pass on contract breaks they can
     check: lint — snapshot and differential fixtures are produced only through the package's published export map
   - id: CONST-T12
-    title: Altitude Is What the Test Calls
+    title: What a Test Does Comes from What It Calls, Not Its Filename
     gate: lint
-    do: decide a test's observer from what it imports and invokes — published names or a decision under mutation — never from a filename, folder, or suffix
-    dont: key which doctrine applies to a test on a label the author can rename
-    harm: a rename silently un-enrolls the file from its observer; the absence reads as coverage
-    check: lint — no rule that selects tests by filename suffix
+    do: classify what a test is by what it imports and calls — public exports or pure logic under mutation — never by its folder, filename, or file extension
+    dont: decide which testing rules apply to a file based on its name or suffix
+    harm: renaming a test file secretly stops its rules from running while the test suite still looks complete
+    check: lint — no linter or test runner rules that pick tests by filename suffix
   - id: CONST-E5
     title: A Gate's Key Is Recomputed, Never Reported
     gate: review
