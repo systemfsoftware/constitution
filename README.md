@@ -2,7 +2,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
 [![System F Software](https://img.shields.io/badge/systemfsoftware.com-constitution-black?style=flat-square)](https://systemfsoftware.com/constitution)
-[![Rules: 33](https://img.shields.io/badge/rules-33%20in%20corpus-blue?style=flat-square)](CONSTITUTION.md)
+[![Rules: 34](https://img.shields.io/badge/rules-34%20in%20corpus-blue?style=flat-square)](CONSTITUTION.md)
 
 Shared engineering laws for repositories at [System F Software](https://systemfsoftware.com).
 
@@ -73,7 +73,7 @@ If the repository is brand new, create an initial commit first (`git commit --al
 | **II: Boundaries** | `CONSTITUTION-ARTICLES.md` | Retrieved | Functional core / imperative shell, values for effects, decode inputs rather than casting. |
 | **III: Verification** | `CONSTITUTION-ARTICLES.md` | Retrieved | Observer-fit test placement, properties by narrow grant, mutation as the measure, independent oracles, pinned published contracts. |
 | **IV: Organization** | `CONSTITUTION-ARTICLES.md` | Retrieved | Organize by domain responsibility, clear naming, keep modules small. |
-| **V: Conduct** | `CONSTITUTION.md` | **Always on** | Fix root causes, challenge decisions before committing, remove code before adding. |
+| **V: Conduct** | `CONSTITUTION.md` | **Always on** | Zero-appeal P0 review enforcement, fix root causes, challenge decisions before committing, remove code before adding. |
 
 ---
 
