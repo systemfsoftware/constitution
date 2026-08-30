@@ -167,7 +167,7 @@ rules:
   - id: CONST-T8
     title: The Observer Must See the Fault Class
     gate: review
-    do: enroll each behavior in the observer that can see its failure class — a pure decision is read by properties and by mutation of that decision; a published operation is read by tests that call only exported names; a shell that only translates is read by those exported-name tests, not by a suite of its own
+    do: enroll each behavior in the observer that can see its failure class — a pure decision is read by an observer that can see a wrong tag (mutation of that decision, and a property only when CONST-T14 earns it); a published operation is read by tests that call only exported names; a shell that only translates is read by those exported-name tests, not by a suite of its own
     dont:
       - give the orchestrator its own test suite — extract the decision or live with the exported-name test
       - enroll adapters, codecs, or wiring in the same mutant set as decisions
