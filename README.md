@@ -110,7 +110,7 @@ Every rule is defined in structured YAML:
 Run the validator to check rule IDs, schema compliance, and references across both files:
 
 ```bash
-pnpm test
+deno task test
 ```
 
 ---

@@ -57,7 +57,7 @@ ID format: `CONST-<family><n>`. Pick the next free number in the family (never r
 | Surface | Files | Rule |
 |---|---|---|
 | **Locked** | `AGENTS.md`, `.husky/_/`, verification scripts | Read and propose changes; do not edit to make verification pass. |
-| **Editable** | `package.json`, `pnpm-lock.yaml`, `commitlint.config.cjs`, `.gitignore`, `.husky/` (hooks only, not `_/`) | Edit freely within the active task. |
+| **Editable** | `deno.json`, `deno.lock`, `commitlint.config.cjs`, `.gitignore`, `.husky/` (hooks only, not `_/`) | Edit freely within the active task. |
 | **Human-controlled** | `CONSTITUTION.md`, `CONSTITUTION-ARTICLES.md`, `README.md`, merging to `main`, pushing, destructive ops | Propose changes; ask the user before acting. |
 
 ## Definition of Done
@@ -73,14 +73,14 @@ A task is done only when ALL of the following are true:
 ## Verification Commands
 
 ```bash
-pnpm test                          # both files: schema, coverage, ids, families, dangling citations
-pnpm exec commitlint --from HEAD~1
+deno task test                       # both files: schema, coverage, ids, families, dangling citations
+deno run --allow-read --allow-env --allow-run npm:@commitlint/cli@21 --from HEAD~1
 ```
 
 After a commit that deletes, splits, merges, or re-scopes a rule — not after every edit — also run the reassignment check against the revision before it:
 
 ```bash
-pnpm test --against <rev>
+deno task test --against <rev>
 ```
 
 ### Anti-Bypass Rules

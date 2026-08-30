@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --config scripts/deno.json --allow-read=CONSTITUTION.md,CONSTITUTION-ARTICLES.md --allow-run=git
+#!/usr/bin/env -S deno run --allow-read=CONSTITUTION.md,CONSTITUTION-ARTICLES.md --allow-run=git
 /**
  * Validate the constitution corpus against constitution-rule/v1.
  *
