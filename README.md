@@ -6,7 +6,7 @@
 
 Shared engineering laws for repositories at [System F Software](https://systemfsoftware.com).
 
-It sets baseline requirements for clean code: a pure functional core behind a thin imperative shell, domain types before logic, property tests, and deleting code before writing more. Principles are stack-neutral, so they apply to any language.
+It sets baseline requirements for clean code: a pure functional core behind a thin imperative shell, domain types before logic, mutation testing for decisions, and deleting code before writing more. Principles are stack-neutral, so they apply to any language.
 
 ```mermaid
 flowchart LR
