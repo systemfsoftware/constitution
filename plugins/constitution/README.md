@@ -1,14 +1,15 @@
-# OMP Plugin — Supreme Engineering Constitution TTSR Rules
+# OMP Plugin — Supreme Engineering Constitution
 
-Time-Traveling Stream Rules (TTSR) plugin for Oh My Pi (OMP) and Claude Code that enforces strict adherence to the [System F Software Engineering Constitution](https://github.com/systemfsoftware/constitution).
+Time-Traveling Stream Rules (TTSR) plugin for Oh My Pi (OMP) and Claude Code that carries the [System F Software Engineering Constitution](https://github.com/systemfsoftware/constitution) into the agent's working context.
 
-## Overview
+## What this plugin does
 
-This plugin installs active stream rules that intercept edits, writes, and reviews violating constitutional articles:
-- **`rules/constitution-pure-core.md` (Article I):** Intercepts impure logic (exceptions, I/O in decisions), primitive obsession, procedural control flow (cyclomatic complexity > 1 in core), and unvalidated states.
-- **`rules/constitution-boundary.md` (Article II):** Intercepts decisions in boundary adapters, eager async promises on public domain surfaces, unchecked type casts (`as any`), and interleaved I/O sandwiches.
-- **`rules/constitution-verification.md` (Article III):** Intercepts mocks on single implementations, tautological/characterization tests, private helper unit tests, and dependent oracles.
-- **`rules/constitution-conduct-review.md` (Article V & Governance):** Enforces mandatory **P0** automatic failure on all undeclared constitutional violations with zero appeals and zero waivers (`CONST-G3`).
+The constitution is **one file** — `CONSTITUTION.md` — resident in agent context on every run. This plugin does not intercept edits and does not point at any retrieved document: a regex cannot see purity, sandwich order, or oracle independence, so the rule files declare no conditions at all. Each states the residency contract for its article and nothing more:
+
+- **`rules/constitution-pure-core.md` (Article I):** the constitution is one file, already in context; apply the article when authoring domain types or decision functions.
+- **`rules/constitution-boundary.md` (Article II):** the same contract for handlers, adapters, ports, and composition roots.
+- **`rules/constitution-verification.md` (Article III):** the same contract for authoring or judging tests.
+- **`rules/constitution-conduct-review.md` (Article V & Governance):** the one active interrupt — fires on mechanically observable downgrade/bypass language during review or implementation and enforces the automatic-P0 / zero-appeal / declared-bypass law (`CONST-G3`, `CONST-W3`).
 
 ## Installation
 
