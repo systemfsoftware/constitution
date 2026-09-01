@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-read=CONSTITUTION.md,CONSTITUTION-ARTICLES.md --allow-run=git
+#!/usr/bin/env -S deno run --allow-read=CONSTITUTION.md --allow-run=git
 /**
  * Validate the constitution corpus against constitution-rule/v1.
  *
@@ -13,14 +13,11 @@
  * Without that comparison a green run means "no rule I happened to parse was
  * malformed", which is not the claim the gate is making.
  *
- * The corpus is two files — the resident law and the retrieved articles — and the
- * union is the unit every check runs over. Ids are unique across it and citations
- * resolve across it: CONST-S4 cites CONST-T9, which lives in the other file. Point
- * this at one file and the coverage comparison above still passes, on a third of
- * the rules, which is precisely the vacuous pass it exists to prevent. A file that
- * is merely absent is not the only shape of that pass: a file present and parsing
- * but declaring no rule scores identically, so every path in PATHS must contribute
- * at least one rule of its own.
+ * The corpus is one file — the resident law, whole and always in context. Ids are
+ * unique across it and citations resolve within it. A corpus path that is merely
+ * absent is not the only shape of a vacuous pass: a file present and parsing but
+ * declaring no rule scores identically to a healthy one, so the corpus path must
+ * contribute at least one rule of its own.
  *
  * There is no backwards compatibility and no retirement ledger. A deleted rule
  * leaves its number vacant and a citation to it resolves to nothing, which is a
@@ -38,7 +35,7 @@
  */
 import { parse } from "@std/yaml";
 
-const PATHS = ["CONSTITUTION.md", "CONSTITUTION-ARTICLES.md"] as const;
+const PATHS = ["CONSTITUTION.md"] as const;
 
 const ID_RE = /^CONST-[A-Z]\d+$/;
 const ID_IN_TEXT_RE = /^\s*- id:\s*(\S+)\s*$/gm;
