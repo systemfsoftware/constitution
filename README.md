@@ -6,7 +6,7 @@
 
 Shared engineering laws for repositories at [System F Software](https://systemfsoftware.com).
 
-It sets baseline requirements for clean code: a pure functional core behind a thin imperative shell, domain types before logic, mutation testing for decisions, and deleting code before writing more. Principles are stack-neutral, so they apply to any language.
+It defines baseline architecture and code quality standards: a pure functional core behind a thin imperative shell, domain types before logic, mutation testing for decision paths, and subtracting code before adding more. Stack-neutral and enforced across all projects.
 
 ```mermaid
 flowchart LR
@@ -20,26 +20,9 @@ flowchart LR
 
 ---
 
-## One file, always resident
+## Quick Start
 
-The whole constitution lives in one file, loaded into agent context on every run:
-
-```
-constitution/
-└── CONSTITUTION.md    # All five articles + Application: resident on every run
-```
-
-| File | Delivery | Contents | How to load it |
-| :--- | :--- | :--- | :--- |
-| `CONSTITUTION.md` | **Always on** | Application + Articles I–V (Pure Core, Boundaries, Testing, Project Layout, Conduct) | Include in agent context on every turn (`@CONSTITUTION.md` in `AGENTS.md` or `CLAUDE.md`) |
-
-Law that is not in the window is not law. Retrieval forces presence of a document, never conformance to it, and compaction silently drops rules that live outside the context window — so nothing is split out and nothing is loaded on demand.
-
----
-
-## Quick start
-
-Vendor the repository using `git subtree` and symlink the constitution to the project root:
+Vendor the repository using `git subtree` and symlink `CONSTITUTION.md` to the project root:
 
 ```bash
 # 1. Fetch the remote into a local ref
@@ -53,43 +36,28 @@ git subtree add --prefix=vendor/constitution refs/remotes/vendor/constitution --
 ln -s vendor/constitution/CONSTITUTION.md CONSTITUTION.md
 ```
 
-If the repository is brand new, create an initial commit first (`git commit --allow-empty -m "init"`).
-
-### Connect to your agent harness
-
-Add `@CONSTITUTION.md` to `AGENTS.md` or `CLAUDE.md`. That is the whole
-wiring: the document is resident in every session, so there is nothing to
-trigger, retrieve, or install.
+Include `@CONSTITUTION.md` in your agent harness (`AGENTS.md` or `CLAUDE.md`) so all 40 rules remain always-on in the context window.
 
 ---
 
-## The articles
+## The Articles
 
-| Article | Core rules |
+The 40 rules are structured across six sections in [`CONSTITUTION.md`](CONSTITUTION.md):
+
+| Section | Key Invariants |
 | :--- | :--- |
-| **Application** | Invoke rules by the harm they name, prefer the gate, evidence before done, the evaluator is not the agent's to edit, the constitution is supreme. |
-| **I: Pure Core** | Pure decisions, explicit types, tagged error variants, no `null` states. |
-| **II: Boundaries** | Functional core / imperative shell, values for effects, decode inputs rather than casting. |
-| **III: Verification** | The trophy's investment order, properties by narrow grant, mutation as the measure, independent oracles, pinned published contracts. |
-| **IV: Organization** | Organize by domain responsibility, clear naming, keep modules small. |
-| **V: Conduct** | Zero-appeal P0 review enforcement, fix root causes, challenge decisions before committing, remove code before adding. |
+| **Application** | Invoke rules by harm rather than clause; build failures decide; the evaluator is not the agent's to edit; evidence before done. |
+| **Article I: Pure Core** | Pure decisions, explicit types, tagged error variants, no `null` states. |
+| **Article II: Boundaries** | Functional core / imperative shell, values for effects, decode inputs rather than casting. |
+| **Article III: Verification** | Testing Trophy investment order, properties by narrow grant, mutation as the measure, independent oracles. |
+| **Article IV: Organization** | Organize by domain responsibility, clear naming, keep modules small. |
+| **Article V: Conduct** | Zero-appeal P0 review enforcement, fix root causes, challenge decisions before committing, subtract before adding. |
 
 ---
 
-## Pulling updates
+## Machine Validation
 
-Pull upstream changes into the subtree without changing existing symlinks:
-
-```bash
-git subtree pull --prefix=vendor/constitution https://github.com/systemfsoftware/constitution.git main --squash \
-  -m "chore: update shared constitution"
-```
-
----
-
-## Machine validation
-
-Every rule is defined in structured YAML:
+Rules are defined as structured YAML blocks in `CONSTITUTION.md`:
 
 ```yaml
 - id: CONST-S4
@@ -101,18 +69,31 @@ Every rule is defined in structured YAML:
   check: review reads the net line delta; fixes that leave root violations are rejected
 ```
 
-Run the validator to check rule IDs, schema compliance, and references across the corpus:
+Run the validator to check rule IDs, schema compliance, and citation integrity across the corpus:
 
 ```bash
 deno task test
 ```
 
+To verify that rule identifiers have not been reassigned against a previous git revision:
+
+```bash
+deno task test --against <rev>
+```
+
 ---
 
-## Contributing
+## Pulling Updates
 
-Amendments need a written explanation, a version bump, and updates to consuming repos. See [AGENTS.md](AGENTS.md) for commit standards and testing guidelines.
+Pull upstream changes into the subtree without touching existing symlinks:
+
+```bash
+git subtree pull --prefix=vendor/constitution https://github.com/systemfsoftware/constitution.git main --squash \
+  -m "chore: update shared constitution"
+```
+
+---
 
 ## License
 
-[Apache-2.0](LICENSE) (c) 2026 Ryan Lee.
+[Apache-2.0](LICENSE) © 2026 Ryan Lee.

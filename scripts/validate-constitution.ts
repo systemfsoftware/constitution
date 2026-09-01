@@ -88,9 +88,7 @@ const against = againstIndex >= 0
 const againstRequested = against !== undefined || againstIndex >= 0 ||
   againstEquals !== undefined;
 if (againstRequested && (against === undefined || against.length === 0)) {
-  fail([
-    "--against requires a revision (form: --against <rev> or --against=<rev>) — a silently skipped comparison is the vacuous pass this gate exists to prevent",
-  ]);
+  fail(["--against requires a revision (form: --against <rev> or --against=<rev>)"]);
 }
 const strayAgainst = Deno.args.find((a) =>
   a.startsWith("--against") && a !== "--against" && !a.startsWith("--against=")
@@ -106,9 +104,7 @@ for (const p of PATHS) {
   try {
     texts[p] = await Deno.readTextFile(p);
   } catch {
-    fail([
-      `${p}: missing — the corpus is one file, and an absent input is a hard failure, never a smaller pass`,
-    ]);
+    fail([`${p}: missing`]);
   }
 }
 
