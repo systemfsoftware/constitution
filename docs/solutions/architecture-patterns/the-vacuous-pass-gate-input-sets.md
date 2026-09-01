@@ -147,6 +147,6 @@ artifact worth keeping:
 
 - The gate discussed here is the constitution corpus validator invoked by the repository's
   `test` script; its module docstring carries the same argument at the point of use.
-- `CONST-E1` (Prefer the Gate) and `CONST-E3` (A Gate Earns Its Place) are the rules that
-  make a gate the final word and price its false-positive budget; this learning is the
-  counterweight — a gate that cannot fail is not enforcement, it is a certificate.
+- `CONST-E6` (Prefer the Gate) makes a gate the final word; the rule that priced a gate's
+  false-positive budget is gone with its vacated number. This learning is the counterweight
+  either way — a gate that cannot fail is not enforcement, it is a certificate.

@@ -2,7 +2,7 @@
 /**
  * Validate the constitution corpus against constitution-rule/v1.
  *
- * Gate for CONST-E1 applied reflexively: the constitution's own format must fail a
+ * Gate for CONST-E6 applied reflexively: the constitution's own format must fail a
  * command, not a cited clause. Validates every fenced ```yaml block against
  * hardcoded schema fields (required_fields, optional_fields, gate_values).
  *
