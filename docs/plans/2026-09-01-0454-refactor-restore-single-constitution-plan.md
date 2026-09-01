@@ -16,7 +16,7 @@ execution: code
 - **Means:** Merge Articles I–IV into `CONSTITUTION.md` byte-identical, mint six rules (`CONST-T15`, `CONST-G4`, `CONST-E6`, `CONST-E7`, `CONST-E8`, `CONST-G5`), rewrite the corpus gate for one file, and gut the plugin's regex interrupts into residency statements (KTD1–KTD10).
 - **Authority:** The invoking directive (carried as labeled settled decisions in this plan). Measured evidence: compaction-driven governance decay — violation 0% with the policy in full context rising to 30% after compaction, 59% worst model, across 1,323 episodes and seven model families (arXiv:2606.22528); prohibition compliance 73% at turn 5 falling to 33% at turn 16 across 4,416 trials (arXiv:2604.20911); re-inserting the policy before the decision restores 0%. Doctrine primaries: Seemann, "AI-generated tests as ceremony" (ploeh.dk, 2026-01-26); Dodds, "Write tests. Not too many. Mostly integration." and "The Testing Trophy and Testing Classifications" (kentcdodds.com). The corpus's own id-surgery law in `AGENTS.md` governs id handling. The base is `origin/main` at `dfa2abc` — the Deno-2-migrated tree (`deno task test`, commitlint via `deno run npm:@commitlint/cli@21`, no `package.json`); its 34-rule corpus is the base being amended, not evidence of correctness (CONST-S2).
 - **Stop conditions:** A gate failure not explained by this amendment's own edits; a byte-identity extraction that mismatches during the merge; evidence that a minted id collides with a vacated number's obligation.
-- **Execution profile:** One feature branch off `main`; four conventional commits in order — plan checkpoint; corpus + gate flip as one atomic commit; plugin; harness prose — pushed as one PR; no push to `main`.
+- **Execution profile:** A feature branch off `main`; the amendment's commits in order — plan checkpoint; corpus + gate flip as one atomic commit; plugin; harness prose — pushed as one PR; no push to `main`. Prerequisite infrastructure repairs (a pre-existing breakage this run must fix to commit at all) may precede or interleave, each its own commit and declared.
 - **Tail ownership:** Branch shipping, PR, and CI watch belong to the calling pipeline. Consumer-repo subtree pulls and any org-tree watchdog citing vacated ids are consumer-owned follow-ups; loud vacancy at their next pull is the intended behavior.
 
 ---
@@ -42,30 +42,30 @@ The August 29 rehaul cut real architecture along with the refuted parts. Its dos
 - **The trophy returns as investment order, not widths.** Static analysis first, properties where CONST-T14 grants them, composition through the sandwich, contracts at the published edge; widths are not a gate; a pyramid of helper units is forbidden. No width table, no layer bars. Characterization-as-duty and blanket properties stay dead — CONST-T14's narrow grant governs. (session-settled: user-directed — chosen over restoring old CONST-T1 verbatim: the dossier refuted the widths and the mandates, not the order) Governs R3.
 - **CONST-T9, CONST-T10, CONST-T14, CONST-E5 stay live and byte-identical.** Oracle independence and recomputed gate keys are the load-bearing verification law for machine-authored code. (session-settled: user-directed — chosen over touching them: they are the surviving half of the doctrine) Governs R2.
 - **CONST-E3 ("A Gate Earns Its Place") is not restored in this pass.** (session-settled: user-directed — chosen over restoring it: that rule is the mechanism by which the Application section accreted into cargo) Governs R4.
-- **Four commits, one PR, feature branch, no push to `main`.** Consumer subtree pulls and org-tree watchdog updates are follow-ups; vacancy at their next pull is the intended loud failure. (session-settled: user-directed — chosen over a wider blast radius: consumer repos must fail loudly at their own pulls)
+- **The amendment lands as its own commit series; prerequisite repairs are declared separately.** Consumer subtree pulls and org-tree watchdog updates are follow-ups; vacancy at their next pull is the intended loud failure. (session-settled: user-directed — chosen over a wider blast radius: consumer repos must fail loudly at their own pulls)
 
 ### Requirements
 
 - R1. `CONSTITUTION.md` contains the entire corpus — the restored Application section plus Articles I–V — and `CONSTITUTION-ARTICLES.md` is deleted from the tree. Check: `deno task test` success line reports exactly 1 file; `git grep -nI 'CONSTITUTION-ARTICLES' -- ':!docs/plans'` prints nothing.
-- R2. Every one of the 34 live rules passes through the merge byte-identical (YAML entry text unchanged; only its position in the file changes). Check: a throwaway per-id extraction diff against `origin/main` for all 34 ids.
+- R2. Every one of the 34 live rules passes through the merge byte-identical (YAML entry text unchanged; only its position in the file changes). Check: a throwaway per-id extraction diff against `origin/main` for all 34 ids, re-read from disk after the write.
 - R3. `CONST-T15` "The Testing Trophy" is minted at the head of Article III: investment order static → properties where CONST-T14 grants them → composition through the sandwich (CONST-B3) → contracts at the published edge; widths are not a gate; a Test Pyramid of helper unit tests is forbidden. Check: `deno task test` parses it; the corpus contains no width bars and no layer table; review reads the order and its two citations resolve.
 - R4. Five governance rules are minted into a restored Application section, in the pre-#9 order minus CONST-E3 (old order G1, E1, E3, E4, E2, G2 at `ebd9b10~1`): `CONST-G4` (old G1 body), `CONST-E6` (old E1 body with the "at the price CONST-E3 sets" clause removed), `CONST-E8` (old E4 body), `CONST-E7` (old E2 body), `CONST-G5` (old G2 body with its `(CONST-E1)` citation repointed to `CONST-E6`). Check: per-id extraction diff against `ebd9b10~1` modulo exactly those two declared edits; `deno task test` reports no dangling citation.
-- R5. Vacated ids appear nowhere as live ids or citations: `CONST-T1/T2/T5`, `CONST-G1/G2`, `CONST-E1–E4`. (`CONST-T6`/`CONST-T7` are vacant, never vacated — no commit in history ever minted them, so they are absent by construction, not by this amendment.) Check: `deno task test --against a8f6b62~1` names exactly `CONST-T1, CONST-T2, CONST-T5` vacated; `deno task test --against ebd9b10~1` names exactly `CONST-E1, CONST-E2, CONST-E3, CONST-E4, CONST-G1, CONST-G2` vacated; both exit 0.
+- R5. Vacated ids appear nowhere as live ids or citations: `CONST-T1/T2/T5`, `CONST-G1/G2`, `CONST-E1–E4`. (`CONST-T6`/`CONST-T7` are vacant, never vacated — no commit in history ever minted them, so they are absent by construction, not by this amendment.) Check: `deno task test --against 9654836~1` — the pre-split single-document revision, where every historical vacancy lived in the one corpus file — names exactly `CONST-E1, CONST-E2, CONST-E3, CONST-E4, CONST-G1, CONST-G2, CONST-T1, CONST-T2, CONST-T5` vacated; `deno task test --against ebd9b10~1` names exactly the six Application-removal ids; both exit 0.
 - R6. `scripts/validate-constitution.ts` is rewritten for the one-file corpus at all three sites that name the corpus paths — the shebang's `--allow-read`, the `deno.json` `test` task's `--allow-read`, and `PATHS` — and the header comment teaches the one-file corpus while preserving every check: fenced-YAML coverage, declared-vs-parsed id accounting, schema fields, family registry, gate values, duplicate ids, citation resolution, `--against` title-keyed reassignment, vacated-id and uncompared-file reporting, and the vacuous-pass doctrine (a missing input is fatal; a present input must contribute rules). Check: `deno task test`; `deno lint` on the script; the dangling-citation probe fails as required.
 - R7. The plugin's `constitution-pure-core.md`, `constitution-boundary.md`, and `constitution-verification.md` rule files carry no regex conditions and state the residency contract: the constitution is one file, already in context, apply the article. `constitution-conduct-review.md` keeps its mechanically-detectable downgrade/bypass conditions. `plugins/constitution/README.md` teaches the same. Check: the three files contain zero `condition:` patterns; both plugin manifests remain valid JSON and unchanged.
 - R8. `README.md` and `AGENTS.md` teach the one-file contract: one symlink in quick start, the file-split sections removed, the delivery table collapsed, the badge recomputed to the validator's count. Check: grep sweep per R1; badge number equals the `deno task test` recomputed rule count.
-- R9. Delivery: feature branch off `main`, four conventional commits in order (plan checkpoint; corpus + gate flip; plugin; harness prose), one PR, no push to `main`. Each message passes the `commit-msg` hook as it lands; the battery re-runs the range. Check: `deno run --allow-read --allow-env --allow-run --allow-sys npm:@commitlint/cli@21 --from HEAD~4` exits 0; `git status --porcelain` empty.
+- R9. Delivery: feature branch off `main`, the amendment's commits in order (plan checkpoint; corpus + gate flip; plugin; harness prose), one PR, no push to `main`. Each message passes the `commit-msg` hook as it lands; the battery re-runs the range. Check: `deno run --allow-read --allow-env --allow-run --allow-sys npm:@commitlint/cli@21 --from <first-commit>~1` exits 0; `git status --porcelain` empty.
 
 ### Success Criteria
 
-- `deno task test` exits 0 with `valid: 40 rules across 6 yaml blocks in 1 file, 9 families` (count recomputed at implementation; 34 live + 6 minted; no `FAMILIES` registry entry is added — all six mints land in existing letters, so the 9 is recomputed from the unchanged registry).
+- `deno task test` exits 0 with `valid: 40 rules across 6 yaml blocks in 1 files, 9 families` (measured; 34 live + 6 minted; no `FAMILIES` registry entry added — all six mints land in existing letters, so the 9 is recomputed from the unchanged registry).
 - All three `--against` fixtures in the Verification Contract behave as specified — vacancies named exactly, no reassignment, exit 0.
 - The byte-identity battery reports 34 identical live rules and 5 restored rules matching `ebd9b10~1` modulo the two declared edits.
 - The dangling-citation probe (a temporary citation to `CONST-T1`) fails the gate naming the citation, then passes after revert — the gate demonstrably bites on this corpus.
 
 ### Scope Boundaries
 
-In scope: `CONSTITUTION.md`, `CONSTITUTION-ARTICLES.md` (deleted), `scripts/validate-constitution.ts`, `deno.json` (the `test` task's read scope only), `plugins/constitution/rules/*.md` (three gutted, one untouched), `plugins/constitution/README.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` (only if it references the deleted filename), this plan.
+In scope: `CONSTITUTION.md`, `CONSTITUTION-ARTICLES.md` (deleted), `scripts/validate-constitution.ts`, `deno.json`, `plugins/constitution/rules/*.md` (three gutted, one untouched), `plugins/constitution/README.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` (only if it references the deleted filename), this plan.
 
 ### Deferred to Follow-Up Work
 
@@ -84,7 +84,7 @@ In scope: `CONSTITUTION.md`, `CONSTITUTION-ARTICLES.md` (deleted), `scripts/vali
 - KTD3. **T15 is authored fresh, in the corpus's rule schema, citing only live ids.** `gate: review` (the value the vacated trophy carried). Its `do` states the order and names CONST-T14 as the grant for the properties band and CONST-B3 as the sandwich; its `dont` forbids the refuted instruments by concept — a mandated numeric layer width, a layer-naming table, the helper-unit pyramid — and must not contain the literal substrings the trophy-instrument sweep scans for (the `█` bar glyph and `layers:`), so rule text and sweep agree without self-matching. No layer table returns. Placement: head of Article III, the position the trophy occupied before vacancy. Governs R3.
 - KTD4. **Restored rule bodies are byte-identical except where they cite vacated ids.** Old E1's `do` carries "at the price CONST-E3 sets" — E3 stays dead, so the clause is removed and CONST-E6's `do` reads, in full: `make any principle that can fail a command — type error, lint rule, mutation threshold, dependency check — fail that command; a failing build is the final word`. Old G2's `do` cites `(CONST-E1)` — repointed to `CONST-E6`, the restored rule carrying that obligation. Both edits are declared here and nowhere else changes. The dangling-citation gate mechanically enforces this decision. Governs R4.
 - KTD5. **Layout restores the pre-split shape minus what carried no obligation.** `# Constitution` → `## Application` (five minted rules) → Articles I–V — the exact heading sequence of the last single-document revision, `9654836~1:CONSTITUTION.md` (Preamble → Application → Articles I–V, all rules in one file). The pre-split document's Preamble is not restored: framing prose is not law, and the delivery contract lives in README/AGENTS.md where a harness author reads it. CONST-E5 stays as Article III's terminal rule — moving it is churn with no obligation change. Governs R1, R4.
-- KTD6. **The validator keeps every check; only the corpus contract changes.** The two-file union commentary dies; the vacuous-pass doctrine it taught (missing input fatal, present-but-empty fatal, vacancies and uncompared files named on the success line, `--against` reassignment recomputed from git) is preserved verbatim in behavior. `--against` semantics: the cross-revision arm iterates `PATHS` only, so against pre-merge revisions it reads `CONSTITUTION.md` at that rev — common ids compare by title, merged ids are new-at-HEAD growth and pass silently, and a file absent from `PATHS` is never reported uncompared. Governs R6.
+- KTD6. **The validator keeps every check; only the corpus contract changes.** The two-file union commentary dies; the vacuous-pass doctrine it taught (missing input fatal, present-but-empty fatal, vacancies and uncompared files named on the success line, `--against` reassignment recomputed from git) is preserved verbatim in behavior. `--against` semantics, measured on this branch: the cross-revision arm reads `PATHS` at the compared revision, so common ids compare by title, merged ids are new-at-HEAD growth and pass silently, and a file absent from `PATHS` is never reported uncompared. The narrowing this buys: a vacancy that lived in a file outside `PATHS` at the compared revision is invisible — `--against a8f6b62~1` names nothing for `CONST-T1/T2/T5` because at that revision they lived in the articles file. Vacancy evidence therefore anchors on revisions where the corpus was one file: `9654836~1` (pre-split) names all nine historical vacancies; `ebd9b10~1` names the six Application-removal ids that lived in the resident file. Governs R6, R5.
 - KTD7. **TTSR gut shape: statement files, zero regex.** The three craft rule files become frontmatter-plus-statement: residency declared, article applied, no `condition:` patterns. The loader's accepted frontmatter shape is resolved before the plugin commit — from the host's plugin documentation or a local `omp plugin link` probe — not discovered mid-commit. If the loader demonstrably rejects condition-less rule files, the fallback is deleting the three files and carrying the statement in `plugins/constitution/README.md` plus the surviving conduct rule; that fallback narrows the plugin's enforcement surface to conduct only, so it is surfaced to the calling pipeline as a decision before it commits, never buried in a commit body. `constitution-conduct-review.md` is untouched: its conditions detect review-conduct language, which is mechanically observable and points at rules that are resident. Governs R7.
 - KTD8. **The gate flip and the corpus merge are one atomic commit.** The gate reads the corpus, so no legal intermediate commit exists: validator-first leaves `PATHS` naming one file while `CONST-T9` — cited twice by the live CONST-S4 — still lives only in the articles file, and the dangling-citation check fails the `pre-commit` hook; corpus-first leaves `PATHS` naming a deleted file, a hard failure by the gate's own missing-input doctrine. Both flips land together, and every commit on the branch is then a full, honest pass of the gate over the corpus it declares. Governs R9.
 - KTD9. **The plan checkpoint is commit 1; no dialogue document is copied into the repo.** The invoking directive reaches this plan as labeled settled decisions in the plan's own voice — repo law forbids plans carrying quoted directives or session narrative, and git history preserves the conversation's outcome in the commit trail. Governs R9.
@@ -133,8 +133,9 @@ Destructive review record (required by the pre-plan gate): three assumptions sur
 ### Risks & Dependencies
 
 - Consumer repos citing vacated ids or the deleted filename fail loudly at their next vendor pull. Intended; follow-up owned by consumers (Scope Boundaries).
-- The badge and AGENTS.md counts are recomputed from the validator's own output at implementation, never copied from this plan — the plan's 40 is a prediction, the gate's count is the fact.
-- `deno.lock` needs no change: `@std/yaml` and the `--allow-run=git` grant are unaffected by the corpus path change, and the read scopes shrink only.
+- The badge and AGENTS.md counts are recomputed from the validator's own output at implementation, never copied from this plan — the plan's 40 was a prediction until the gate measured it.
+- `deno.lock` needs no amendment-driven change: `@std/yaml` and the `--allow-run=git` grant are unaffected by the corpus path change, and the read scopes shrink only.
+- The corpus-contract change narrows what `--against` can see (KTD6): vacancies that lived in the articles file are only provable against pre-split-era revisions. Measured, accepted, and encoded in R5's fixtures rather than patched into the gate — a redesign of the cross-revision arm is its own amendment.
 
 ---
 
@@ -148,7 +149,7 @@ Destructive review record (required by the pre-plan gate): three assumptions sur
 
 **Dependencies:** none
 
-**Files:** `docs/plans/2026-09-01-0446-refactor-restore-single-constitution-plan.md`
+**Files:** `docs/plans/2026-09-01-0454-refactor-restore-single-constitution-plan.md`
 
 **Approach:**
 
@@ -187,7 +188,7 @@ Destructive review record (required by the pre-plan gate): three assumptions sur
 - `deno task test` at this commit: exit 0, one file, minted ids parse, families/gates registered, no dangling citations — including the CONST-S4 → CONST-T9 citation, which now resolves in-file.
 - Empty-corpus probe: temporarily strip the yaml blocks from the working-tree `CONSTITUTION.md` → gate fails declaring no rules; revert.
 - Byte-identity battery: 34/34 identical; restored five match `ebd9b10~1` modulo KTD4's two edits.
-- Vacancy fixtures: `--against a8f6b62~1` and `--against ebd9b10~1` name exactly their historical sets.
+- Vacancy fixtures: `--against 9654836~1` names exactly the nine historical vacancies; `--against ebd9b10~1` names exactly the six Application-removal ids.
 
 **Verification:** all four scenario groups pass at this commit; `deno lint` clean on the validator.
 
@@ -221,7 +222,7 @@ The former U3 content moved into U2 — the gate flip and the corpus merge are o
 
 ### U5. Full verification battery and commits
 
-**Goal:** Every check in the Verification Contract runs green in order, and the four commits stand.
+**Goal:** Every check in the Verification Contract runs green in order, and the amendment's commits stand.
 
 **Requirements:** R1–R9
 
@@ -244,18 +245,18 @@ The former U3 content moved into U2 — the gate flip and the corpus merge are o
 
 | Check | Command / method | Exit criterion |
 |---|---|---|
-| Corpus gate | `deno task test` | Exit 0; success line reports 40 rules across 6 yaml blocks in 1 file, 9 families |
+| Corpus gate | `deno task test` | Exit 0; success line reports 40 rules across 6 yaml blocks in 1 files, 9 families |
 | Byte identity | per-id extraction: 34 live ids diffed against the `origin/main` file that carried each; 5 restored ids against `ebd9b10~1:CONSTITUTION.md` | 34 live rules identical; 5 restored match modulo the two declared KTD4 edits |
-| Vacancy — August rehaul | `deno task test --against a8f6b62~1` | Exit 0; names exactly CONST-T1, CONST-T2, CONST-T5 vacated |
+| Vacancy — pre-split single document | `deno task test --against 9654836~1` | Exit 0; names exactly CONST-E1, CONST-E2, CONST-E3, CONST-E4, CONST-G1, CONST-G2, CONST-T1, CONST-T2, CONST-T5 vacated |
 | Vacancy — Application removal | `deno task test --against ebd9b10~1` | Exit 0; names exactly CONST-E1, CONST-E2, CONST-E3, CONST-E4, CONST-G1, CONST-G2 vacated |
-| Reassignment | `deno task test --against <the plan-checkpoint commit>` (the commit preceding the atomic corpus+gate commit) | Exit 0; no id reassigned; zero ids vacated |
+| Reassignment | `deno task test --against <the plan-checkpoint commit>` | Exit 0; no id reassigned; zero ids vacated |
 | Dangling-citation probe | temporarily cite CONST-T1, run `deno task test`, revert | Fails naming the dangling citation; green after revert |
 | Filename sweep | `git grep -nI 'CONSTITUTION-ARTICLES' -- ':!docs/plans'` | Zero lines (git grep exits 1 when clean) |
 | Trophy-instrument sweep | grep the corpus for the `█` glyph and the literal `layers:` | Zero matches (T15's own text avoids both by KTD3) |
 | Vacated-id sweep | grep live surfaces for `CONST-T1`, `CONST-T2`, `CONST-T5`, `CONST-G1`, `CONST-G2`, `CONST-E1`–`CONST-E4` | Zero matches outside `docs/plans/` |
 | Plugin shape | grep `condition:` in the three gutted rule files; parse both manifests | Zero condition entries; JSON valid |
 | Lint | `deno lint` on the validator | Clean |
-| Commit format | `deno run --allow-read --allow-env --allow-run --allow-sys npm:@commitlint/cli@21 --from HEAD~4` | Exit 0 (each commit already passed the commit-msg hook individually) |
+| Commit format | `deno run --allow-read --allow-env --allow-run --allow-sys npm:@commitlint/cli@21 --from <first-commit>~1` | Exit 0 (each commit already passed the commit-msg hook individually) |
 | Clean tree | `git status --porcelain` | Empty |
 
 ---
@@ -264,5 +265,5 @@ The former U3 content moved into U2 — the gate flip and the corpus merge are o
 
 - All Verification Contract rows pass on the branch head, in the current session, with output recorded.
 - `CONSTITUTION.md` is the only corpus file; 40 rules; the six mints present; the 34 live rules byte-identical.
-- The four commits exist in the specified order on a feature branch, commitlint-clean, working tree clean, nothing pushed to `main`.
+- The amendment's commits exist in the specified order on a feature branch, commitlint-clean, working tree clean, nothing pushed to `main`. Prerequisite infrastructure repairs, where the base branch was broken, are separate declared commits.
 - Residuals (consumer pulls, watchdog citations) are recorded as follow-ups by the calling pipeline, not left as silent scope.
