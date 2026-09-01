@@ -1,6 +1,6 @@
 # AGENTS.md — Constitution Repository
 
-Single source of truth for the supreme design law of [System F Software](https://systemfsoftware.com). Consumer repos vendor via `git subtree` + symlink. This repo has no production code, no test suite, and no build step — it is one markdown document plus its governance tooling (corpus validation, commit validation, agent harness): `CONSTITUTION.md`, resident in every agent's context, all articles, always.
+Single source of truth for the supreme design law of [System F Software](https://systemfsoftware.com). Consumer repos vendor via `git subtree` + symlink. This repo has no production code, no test suite, and no build step — it is one markdown document plus its governance tooling (corpus validation, commit validation): `CONSTITUTION.md`, resident in every agent's context, all articles, always.
 
 @CONSTITUTION.md
 

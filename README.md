@@ -57,12 +57,9 @@ If the repository is brand new, create an initial commit first (`git commit --al
 
 ### Connect to your agent harness
 
-1. Add `@CONSTITUTION.md` to `AGENTS.md` or `CLAUDE.md`.
-2. Optionally add the marketplace and install the TTSR plugin, whose rule files state the same residency contract:
-   ```bash
-   omp plugin marketplace add systemfsoftware/constitution
-   omp plugin install constitution@systemfsoftware-marketplace
-   ```
+Add `@CONSTITUTION.md` to `AGENTS.md` or `CLAUDE.md`. That is the whole
+wiring: the document is resident in every session, so there is nothing to
+trigger, retrieve, or install.
 
 ---
 
