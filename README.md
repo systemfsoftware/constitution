@@ -2,7 +2,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
 [![System F Software](https://img.shields.io/badge/systemfsoftware.com-constitution-black?style=flat-square)](https://systemfsoftware.com/constitution)
-[![Rules: 34](https://img.shields.io/badge/rules-34%20in%20corpus-blue?style=flat-square)](CONSTITUTION.md)
+[![Rules: 40](https://img.shields.io/badge/rules-40%20in%20corpus-blue?style=flat-square)](CONSTITUTION.md)
 
 Shared engineering laws for repositories at [System F Software](https://systemfsoftware.com).
 
@@ -20,28 +20,26 @@ flowchart LR
 
 ---
 
-## Two files, two roles
+## One file, always resident
 
-The rules split into two files based on when an agent needs to see them:
+The whole constitution lives in one file, loaded into agent context on every run:
 
 ```
 constitution/
-├── CONSTITUTION.md             # Resident: loaded on every run
-└── CONSTITUTION-ARTICLES.md    # On demand: retrieved when editing source files
+└── CONSTITUTION.md    # All five articles + Application: resident on every run
 ```
 
 | File | Delivery | Contents | How to load it |
 | :--- | :--- | :--- | :--- |
-| `CONSTITUTION.md` | **Always on** | Conduct (Article V) | Include in agent context on every turn (`@CONSTITUTION.md` in `AGENTS.md` or `CLAUDE.md`) |
-| `CONSTITUTION-ARTICLES.md` | **On demand** | Articles I to IV (Pure Core, Boundaries, Testing, Project Layout) | Load via tool hook or path rule when editing source code (never on read) |
+| `CONSTITUTION.md` | **Always on** | Application + Articles I–V (Pure Core, Boundaries, Testing, Project Layout, Conduct) | Include in agent context on every turn (`@CONSTITUTION.md` in `AGENTS.md` or `CLAUDE.md`) |
 
-Rules about conduct stay resident because nothing triggers them after a mistake happens. Craft rules (like how to structure a domain model or write a test) only need to load when someone touches source code.
+Law that is not in the window is not law. Retrieval forces presence of a document, never conformance to it, and compaction silently drops rules that live outside the context window — so nothing is split out and nothing is loaded on demand.
 
 ---
 
 ## Quick start
 
-Vendor the repository using `git subtree` and symlink both files to the project root:
+Vendor the repository using `git subtree` and symlink the constitution to the project root:
 
 ```bash
 # 1. Fetch the remote into a local ref
@@ -51,9 +49,8 @@ git fetch https://github.com/systemfsoftware/constitution.git main:refs/remotes/
 git subtree add --prefix=vendor/constitution refs/remotes/vendor/constitution --squash \
   -m "chore: vendor shared constitution"
 
-# 3. Symlink both files to the repo root
+# 3. Symlink the constitution to the repo root
 ln -s vendor/constitution/CONSTITUTION.md CONSTITUTION.md
-ln -s vendor/constitution/CONSTITUTION-ARTICLES.md CONSTITUTION-ARTICLES.md
 ```
 
 If the repository is brand new, create an initial commit first (`git commit --allow-empty -m "init"`).
@@ -61,8 +58,7 @@ If the repository is brand new, create an initial commit first (`git commit --al
 ### Connect to your agent harness
 
 1. Add `@CONSTITUTION.md` to `AGENTS.md` or `CLAUDE.md`.
-2. Set up a path-scoped rule (`.claude/rules/` or `.cursor/rules/`) to provide `CONSTITUTION-ARTICLES.md` when editing source files.
-3. Or add the marketplace and install the TTSR plugin to intercept violations during edits:
+2. Optionally add the marketplace and install the TTSR plugin, whose rule files state the same residency contract:
    ```bash
    omp plugin marketplace add systemfsoftware/constitution
    omp plugin install constitution@systemfsoftware-marketplace
@@ -72,13 +68,14 @@ If the repository is brand new, create an initial commit first (`git commit --al
 
 ## The articles
 
-| Article | File | Mode | Core rules |
-| :--- | :--- | :--- | :--- |
-| **I: Pure Core** | `CONSTITUTION-ARTICLES.md` | Retrieved | Pure decisions, explicit types, tagged error variants, no `null` states. |
-| **II: Boundaries** | `CONSTITUTION-ARTICLES.md` | Retrieved | Functional core / imperative shell, values for effects, decode inputs rather than casting. |
-| **III: Verification** | `CONSTITUTION-ARTICLES.md` | Retrieved | Observer-fit test placement, properties by narrow grant, mutation as the measure, independent oracles, pinned published contracts. |
-| **IV: Organization** | `CONSTITUTION-ARTICLES.md` | Retrieved | Organize by domain responsibility, clear naming, keep modules small. |
-| **V: Conduct** | `CONSTITUTION.md` | **Always on** | Zero-appeal P0 review enforcement, fix root causes, challenge decisions before committing, remove code before adding. |
+| Article | Core rules |
+| :--- | :--- |
+| **Application** | Invoke rules by the harm they name, prefer the gate, evidence before done, the evaluator is not the agent's to edit, the constitution is supreme. |
+| **I: Pure Core** | Pure decisions, explicit types, tagged error variants, no `null` states. |
+| **II: Boundaries** | Functional core / imperative shell, values for effects, decode inputs rather than casting. |
+| **III: Verification** | The trophy's investment order, properties by narrow grant, mutation as the measure, independent oracles, pinned published contracts. |
+| **IV: Organization** | Organize by domain responsibility, clear naming, keep modules small. |
+| **V: Conduct** | Zero-appeal P0 review enforcement, fix root causes, challenge decisions before committing, remove code before adding. |
 
 ---
 
@@ -107,7 +104,7 @@ Every rule is defined in structured YAML:
   check: review reads the net line delta; fixes that leave root violations are rejected
 ```
 
-Run the validator to check rule IDs, schema compliance, and references across both files:
+Run the validator to check rule IDs, schema compliance, and references across the corpus:
 
 ```bash
 deno task test
