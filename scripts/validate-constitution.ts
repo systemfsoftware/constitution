@@ -107,7 +107,7 @@ for (const p of PATHS) {
     texts[p] = await Deno.readTextFile(p);
   } catch {
     fail([
-      `${p}: missing — the corpus is both files, and half a corpus scores exactly like a whole one`,
+      `${p}: missing — the corpus is one file, and an absent input is a hard failure, never a smaller pass`,
     ]);
   }
 }
