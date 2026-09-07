@@ -2,6 +2,14 @@
 
 Doctrine for whoever owns the instruments that grade the maker — lint gates, stream rules, CI checks, thresholds, rubrics, advisors. This document is **not resident** in the maker's context and must never be `@`-imported by a maker's harness: the maker's law is `CONSTITUTION.md`; this file is read by the channel that builds and changes the machinery of judgment, at the moment it does so.
 
+## How this document is reached
+
+Nothing in the maker's context points here — that is the design. The pointer lives at the surfaces that own instruments. A consumer repo wires it once: in every `AGENTS.md` (or equivalent leaf) that governs an enforcement surface — the lint-plugin packages, the guard scripts, the CI workflows, the rules directories, the advisor roster — one routing line:
+
+> You are editing an enforcement instrument. Read the vendored `ENFORCEMENT.md` before this lands: gate design, instrument-change discipline, and enrollment law are owned there.
+
+The maker doing product work never sees this document. The agent whose task *is* instrument work meets it through the surface's own leaf, at the moment the work starts.
+
 ## The ladder
 
 An obligation binds through the strongest mechanism that can carry it, strongest first:

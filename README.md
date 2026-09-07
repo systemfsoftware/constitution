@@ -36,7 +36,7 @@ git subtree add --prefix=vendor/constitution refs/remotes/vendor/constitution --
 ln -s vendor/constitution/CONSTITUTION.md CONSTITUTION.md
 ```
 
-Include `@CONSTITUTION.md` in your agent harness (`AGENTS.md` or `CLAUDE.md`) so all 38 rules remain always-on in the context window. Never include `ENFORCEMENT.md` — it is doctrine for whoever builds the gates, not for the agent the gates grade.
+Include `@CONSTITUTION.md` in your agent harness (`AGENTS.md` or `CLAUDE.md`) so all 38 rules remain always-on in the context window. Never include `ENFORCEMENT.md` there — it is doctrine for whoever builds the gates, not for the agent the gates grade. Instead, wire it at the surfaces that own instruments: in every `AGENTS.md` leaf governing a lint plugin, guard script, CI workflow, rules directory, or advisor roster, add one routing line — "You are editing an enforcement instrument. Read the vendored `ENFORCEMENT.md` before this lands."
 
 ---
 

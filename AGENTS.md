@@ -26,7 +26,7 @@ Before making changes:
 ### Corpus
 
 - **`CONSTITUTION.md` (Resident):** the entire maker corpus — the Application section plus Articles I–V — loaded in every session. There is no retrieved half and no on-demand trigger: law that is not in the window is not law. Residency delivers obligation, not enforcement; the machinery of judgment lives outside the maker's reach.
-- **`ENFORCEMENT.md` (Non-resident):** the instrument owner's doctrine — gate design, instrument-change discipline, enrollment law. Read by whoever builds or changes a gate, never `@`-imported into a maker's context.
+- **`ENFORCEMENT.md` (Non-resident):** the instrument owner's doctrine — gate design, instrument-change discipline, enrollment law. Read by whoever builds or changes a gate, never `@`-imported into a maker's context. Consumer repos route to it from the leaves that own enforcement surfaces (lint plugins, guard scripts, CI workflows, rules directories, advisor rosters): one line — "You are editing an enforcement instrument. Read the vendored `ENFORCEMENT.md` before this lands." A routing line added anywhere else is the defect: the maker must not meet instrument doctrine while doing graded work.
 
 ### Writing a Rule
 
