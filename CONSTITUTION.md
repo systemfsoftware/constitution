@@ -281,7 +281,7 @@ rules:
   - id: CONST-T11
     title: Snapshots and Differentials Are Development-Time Evidence, Never Committed Artifacts
     gate: lint
-    do: use stored-output snapshots and same-lineage differentials only as development-time evidence in a dot-prefixed, always-gitignored scratch directory; the committed suite asserts intended behavior against an oracle the subject did not produce (CONST-T10)
+    do: use stored-output snapshots and same-lineage differentials only as development-time evidence in a dot-prefixed, always-gitignored scratch directory; the committed suite asserts intended behavior against an oracle the subject did not produce
     dont:
       - commit a stored-output snapshot, a recorded-output fixture, or a differential-comparison test
       - keep scratch evidence past the commit that lands the intended-contract tests
