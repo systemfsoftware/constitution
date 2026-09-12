@@ -267,7 +267,7 @@ rules:
       - treat a mutation or property score as proof a deleted published capability still exists — those are blind to absence
       - leave a persisted gold after the old path is gone unless the gold is externally authored, independently gated, and cheap to re-bless
     harm: a rebuild silently drops a capability; same-session gold blesses the bug; a clean score after a delete is a silent regression
-    check: review — pins call only published names; each expected value names an independent source (spec clause, prior published major, second implementation, or a hand-written oracle next to the constructor)
+    check: review — pins call only published names; each expected value names an independent source (spec clause, second implementation, or a hand-written oracle next to the constructor), never the subject's own output or a second build of it
   - id: CONST-T10
     title: The Oracle Is Not the System Under Test
     gate: review
@@ -278,15 +278,17 @@ rules:
       - treat generated accept-laws as full coverage of a refinement
     harm: a green suite that cannot fail when the behavior is wrong; widening a refinement leaves generated laws green
     check: review — plus sabotage (after green, break one core law and one published field; at least one test must go red)
-  - id: CONST-T11
-    title: Snapshots and Differentials Are Published-Surface Oracles
+  - id: CONST-T16
+    title: Snapshots and Differentials Are Development-Time Evidence, Never Committed Artifacts
     gate: lint
-    do: snapshot only canonicalized published output; compare two implementations only of the same published operation (or a prior published major against current)
+    do: keep stored-output snapshots and same-lineage differentials out of the repository — use them only as development-time evidence in a dot-prefixed gitignored scratch directory, deleted in the commit that lands the intended-contract tests; the committed suite asserts intended behavior against an oracle the subject did not produce (CONST-T10)
     dont:
-      - snapshot or compare private helpers, mappers, or unexported modules
+      - commit a stored-output snapshot, a recorded-output fixture, or a differential-comparison test, in a test file, a document, or a fixture
+      - keep scratch evidence past the commit that lands the intended-contract tests
+      - snapshot or compare a private helper, mapper, or unexported module
       - snapshot a value small enough to be a property or a named example
-    harm: tests that fail on refactors callers cannot see and pass on contract breaks they can
-    check: lint — snapshot and differential fixtures are produced only through the package's published export map
+    harm: a committed capture re-records whatever the subject currently does and passes forever, certifying nothing; a committed differential passes whenever both builds of the same subject share a bug; a snapshot of a private helper pins a shape no caller can see
+    check: lint — a rule over committed files rejects a stored output, a snapshot API call, or a same-lineage differential import; review — scratch is gitignored, unimported by any collected test, and deleted in the landing commit
   - id: CONST-T12
     title: What a Test Does Comes from What It Calls, Not Its Filename
     gate: lint
