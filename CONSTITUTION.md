@@ -278,17 +278,15 @@ rules:
       - treat generated accept-laws as full coverage of a refinement
     harm: a green suite that cannot fail when the behavior is wrong; widening a refinement leaves generated laws green
     check: review — plus sabotage (after green, break one core law and one published field; at least one test must go red)
-  - id: CONST-T16
+  - id: CONST-T11
     title: Snapshots and Differentials Are Development-Time Evidence, Never Committed Artifacts
     gate: lint
-    do: keep stored-output snapshots and same-lineage differentials out of the repository — use them only as development-time evidence in a dot-prefixed gitignored scratch directory, deleted in the commit that lands the intended-contract tests; the committed suite asserts intended behavior against an oracle the subject did not produce (CONST-T10)
+    do: use stored-output snapshots and same-lineage differentials only as development-time evidence in a dot-prefixed, always-gitignored scratch directory; the committed suite asserts intended behavior against an oracle the subject did not produce (CONST-T10)
     dont:
-      - commit a stored-output snapshot, a recorded-output fixture, or a differential-comparison test, in a test file, a document, or a fixture
+      - commit a stored-output snapshot, a recorded-output fixture, or a differential-comparison test
       - keep scratch evidence past the commit that lands the intended-contract tests
-      - snapshot or compare a private helper, mapper, or unexported module
-      - snapshot a value small enough to be a property or a named example
-    harm: a committed capture re-records whatever the subject currently does and passes forever, certifying nothing; a committed differential passes whenever both builds of the same subject share a bug; a snapshot of a private helper pins a shape no caller can see
-    check: lint — a rule over committed files rejects a stored output, a snapshot API call, or a same-lineage differential import; review — scratch is gitignored, unimported by any collected test, and deleted in the landing commit
+    harm: a committed capture re-records whatever the subject currently does and passes forever, certifying nothing; a committed differential passes whenever both builds of the same subject share a bug
+    check: lint — no snapshot API call and no same-lineage differential import in a committed test file; review — the scratch directory is gitignored and empty at commit
   - id: CONST-T12
     title: What a Test Does Comes from What It Calls, Not Its Filename
     gate: lint

@@ -8,7 +8,7 @@ Shared domain vocabulary for this project — entities, named processes, and sta
 The complete set of law documents the repository ships, treated as one unit. The corpus is what the gate certifies and what agents are bound by — not any single file's contents. Shrinking the measured portion of the corpus is a defect, not an optimization.
 
 ### Rule
-One fenced YAML block inside the constitution carrying an id of the form `CONST-<family><number>` — the family letter is one of G, E, P, D, B, T, N, W, S (governance, enforcement, purity, domain modelling, boundary, testing, naming & structure, work discipline, subtraction). A rule is the atomic unit of law: it is minted with a fresh number, amended in place when its obligation is only reworded or moved, retired and re-minted with the next free number when its obligation is narrowed, widened, split, or re-scoped, and never renamed under its existing id — a rename is an id reassignment, which the corpus gate refuses. Minting takes the next free number in the family — a minting law enforced by review, not by the gate. A vacated number is never reused for new law.
+One fenced YAML block inside the constitution carrying an id of the form `CONST-<family><number>` — the family letter is one of G, E, P, D, B, T, N, W, S (governance, enforcement, purity, domain modelling, boundary, testing, naming & structure, work discipline, subtraction). A rule is the atomic unit of law: it is minted with a fresh number, amended in place, or vacated. Minting takes the next free number in the family — a minting law enforced by review, not by the gate. A vacated number is never reused for new law.
 
 
 ### Vacuous pass
