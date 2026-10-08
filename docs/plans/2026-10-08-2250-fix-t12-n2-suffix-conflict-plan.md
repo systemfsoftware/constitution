@@ -173,7 +173,7 @@ CONST-S4's `check` opens with "review reads the net line delta" (`CONSTITUTION.m
 |---|---|---|
 | Corpus schema | `deno task test` | `valid: 36 rules across 6 yaml blocks in 1 files, 9 families` |
 | Id identity | `deno task test --against origin/main` | `no id reassigned since origin/main`, with no vacated-id line |
-| Commit message | `deno run --allow-read --allow-env --allow-run npm:@commitlint/cli@21 --from HEAD~1` | exit 0 |
+| Commit message | `deno run --allow-read --allow-env --allow-run --allow-sys npm:@commitlint/cli@21 --from HEAD~1` | exit 0 |
 | Diff scope | `git diff origin/main` restricted to `CONSTITUTION.md` and `README.md` | only T12 `check`, the T12 `scope` insertion, S4 `check`, and README line 69 change |
 | R5 | the T12 block after the edit | contains no `CONST-` id other than its own, and no literal file suffix |
 | R2, R11 | `git diff origin/main -- CONSTITUTION.md` | no hunk outside the T12 and S4 blocks |
