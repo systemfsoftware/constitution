@@ -276,8 +276,9 @@ rules:
     gate: lint
     do: classify what a test is by what it imports and calls — public exports or pure logic under mutation — never by its folder, filename, or file extension
     dont: decide which testing rules apply to a file based on its name or suffix
+    scope: states how `do` and `check` are read — `do` governs what kind of test a file is, not whether a file is a test at all; the rule binds which requirement, harness, or suite governs a test, never what a file is called; a lint that checks a file's name or placement, against an allowed list or against the file's imports, governs the name and states no requirement a rename can drop, because every requirement it enforces resolves from the test's imports and calls; a runner may recognise a file as a test by the generic test-file ending it uses to discover tests, which decides only that the file runs, never which requirement, harness, or suite governs it
     harm: renaming a test file secretly stops its rules from running while the test suite still looks complete
-    check: lint — no linter or test runner rules that pick tests by filename suffix
+    check: lint — no rule, runner, project split, or tool chooses the requirement, harness, or suite that governs a test from its folder or from any part of its name beyond the generic test-file ending; each requirement resolves from the test's imports and calls
 ```
 
 ---
@@ -389,7 +390,7 @@ rules:
       - treat code as sound because it compiles, is large, or is old
       - mistake taste ("I'd write it differently") for rot
     harm: the codebase only grows; rot survives every patch and regrows; each copied pattern seeds the next, and the average drifts down
-    check: review reads the net line delta — a refactor/improvement/chore that adds net lines states why and names what it deleted (features and their tests are exempt); a fix that leaves a named root violation standing is rejected; "rotten" names the invariant the core breaks; a structural rebuild ships a CONST-T9 pin on every published path it deletes
+    check: review computes the net line delta from the diff against the change's base (the merge base of the change and its target branch at the time of review, recomputed whenever the target moves), never from a figure the author supplied — a refactor/improvement/chore that adds net lines states why and names what it deleted (features and their tests are exempt); a fix that leaves a named root violation standing is rejected; "rotten" names the invariant the core breaks; a structural rebuild ships a CONST-T9 pin on every published path it deletes
     example:
       wrong: add formatPhone() beside the three formatters already there
       right: delete the three, keep one parameterised formatter

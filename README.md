@@ -66,7 +66,7 @@ Rules are defined as structured YAML blocks in `CONSTITUTION.md`:
   do: treat every line as a liability — removal is the default response to slop
   dont: extend a copy-paste cluster; patch around a rotten core
   harm: the codebase only grows; rot survives every patch and regrows
-  check: review reads the net line delta; fixes that leave root violations are rejected
+  check: review computes the net line delta from the diff; fixes that leave root violations are rejected
 ```
 
 Run the validator to check rule IDs, schema compliance, and citation integrity across the corpus:
