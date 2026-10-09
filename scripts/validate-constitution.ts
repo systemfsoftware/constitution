@@ -208,20 +208,26 @@ function isDefinitionLine(line: string): boolean {
   return DEF_LINE_RES.some((r) => r.test(line));
 }
 
-const parsedDefinitionLines = new Map<string, Set<number>>();
+type ParsedBlock = { first: number; count: number; declared: Set<string> };
 
-function definesHere(path: string, lineNumber: number, line: string): boolean {
-  return isDefinitionLine(line) &&
-    (parsedDefinitionLines.get(path)?.has(lineNumber) ?? false);
+const parsedBlocks = new Map<string, ParsedBlock[]>();
+
+function isDeclaredDefinition(path: string, lineNumber: number, line: string): boolean {
+  if (!isDefinitionLine(line)) return false;
+  const block = parsedBlocks.get(path)?.find(
+    (b) => lineNumber >= b.first && lineNumber < b.first + b.count,
+  );
+  if (block === undefined) return false;
+  return [...line.matchAll(CITE_RE)].every((m) => block.declared.has(m[0]));
 }
 
-function markParsedLines(path: string, range: LineRange): void {
-  let lines = parsedDefinitionLines.get(path);
-  if (lines === undefined) {
-    lines = new Set<number>();
-    parsedDefinitionLines.set(path, lines);
+function markParsedLines(path: string, range: LineRange, declared: Set<string>): void {
+  let blocks = parsedBlocks.get(path);
+  if (blocks === undefined) {
+    blocks = [];
+    parsedBlocks.set(path, blocks);
   }
-  for (let n = range.first; n < range.first + range.count; n++) lines.add(n);
+  blocks.push({ first: range.first, count: range.count, declared });
 }
 
 const againstIndex = Deno.args.indexOf("--against");
@@ -285,8 +291,13 @@ for (const b of lawBlocks) {
     );
     continue;
   }
-  markParsedLines(b.path, b.bodyRange);
-  for (const item of doc) laws.push(item as Map_);
+  const declared = new Set<string>();
+  for (const item of doc) {
+    laws.push(item as Map_);
+    const id = asMap(item)?.id;
+    if (typeof id === "string") declared.add(id);
+  }
+  markParsedLines(b.path, b.bodyRange, declared);
 }
 
 const constWords = words(constText);
@@ -438,8 +449,27 @@ function readCorpus(text: string): CorpusRead {
   return read;
 }
 
+function declaredCorpusIds(read: CorpusRead): Set<string> {
+  const declared = new Set<string>();
+  for (const e of read.entries) {
+    const em = asMap(e);
+    if (em === null) continue;
+    if (typeof em.law === "string") declared.add(em.law);
+    if (Array.isArray(em.absorbs)) {
+      for (const a of em.absorbs) if (typeof a === "string") declared.add(a);
+    }
+  }
+  for (const e of [...read.judging, ...read.retired]) {
+    const em = asMap(e);
+    if (em !== null && typeof em.id === "string") declared.add(em.id);
+  }
+  return declared;
+}
+
 const live = readCorpus(enfText);
-if (live.blockRange !== null) markParsedLines(ENFORCEMENT, live.blockRange);
+if (live.blockRange !== null) {
+  markParsedLines(ENFORCEMENT, live.blockRange, declaredCorpusIds(live));
+}
 const corpusText = live.text;
 const corpusMissing = corpusText === null;
 const rawCorpusIds = corpusText === null ? 0 : countRaw(corpusText, RAW_CORPUS_ID_RE);
@@ -472,16 +502,21 @@ async function lineageIds(): Promise<Set<string>> {
     const blobs = await gitCatFileBatch(refs);
     for (const commit of commits) {
       const lawText = blobs.get(`${commit}:./${CONSTITUTION}`);
-      if (lawText !== undefined && lawText !== null) {
-        for (const id of idsFromConstitutionAtRev(lawText)) ids.add(id);
-      }
+      const declaredHere = new Set<string>(
+        lawText !== undefined && lawText !== null
+          ? idsFromConstitutionAtRev(lawText)
+          : [],
+      );
+      for (const id of declaredHere) ids.add(id);
       const doctrine = blobs.get(`${commit}:./${ENFORCEMENT}`);
       if (doctrine !== undefined && doctrine !== null) {
         const at = readCorpus(doctrine);
         if (at.hasMap) {
           for (const e of at.entries) {
             const em = asMap(e);
-            if (em !== null && typeof em.law === "string") ids.add(em.law);
+            if (em !== null && typeof em.law === "string" && declaredHere.has(em.law)) {
+              ids.add(em.law);
+            }
           }
           for (const e of at.judging) {
             const em = asMap(e);
@@ -772,7 +807,7 @@ for (const p of PATHS) {
   const lines = texts[p].split("\n");
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (definesHere(p, i, line)) continue;
+    if (isDeclaredDefinition(p, i, line)) continue;
     for (const m of line.matchAll(CITE_RE)) {
       const id = m[0];
       if (validTargets.has(id)) continue;
