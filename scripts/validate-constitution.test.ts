@@ -116,7 +116,7 @@ async function withCorpus(
   files: { constitution?: string; enforcement: string },
   fn: (dir: string) => Promise<void>,
 ): Promise<void> {
-  const dir = await Deno.makeTempDir({ prefix: "constitution-test-" });
+  const dir = await Deno.makeTempDir({ dir: "/tmp", prefix: "constitution-test-" });
   try {
     await Deno.writeTextFile(`${dir}/CONSTITUTION.md`, files.constitution ?? CONSTITUTION);
     await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, files.enforcement);
