@@ -1,1 +1,2 @@
 deno task test
+deno task test:validator
