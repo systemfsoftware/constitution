@@ -1,2 +1,1 @@
-deno task test
-deno task test:validator
+deno task test && deno task test:validator

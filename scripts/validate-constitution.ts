@@ -424,8 +424,11 @@ const corpus: Corpus = {
 /**
  * The comparison revision for lineage acceptance: `--against <rev>`, or `HEAD`
  * when there is no flag. An absorbed or retired id is accepted when it is on
- * the frozen pre-rewrite list or was live at this revision — the rule the
- * lineage contract already prescribes for ids minted after the rewrite.
+ * the frozen pre-rewrite list, was live at this revision, or is itself retired
+ * or absorbed at this revision — the rule the lineage contract already
+ * prescribes for an id minted after the rewrite and retired or absorbed in a
+ * later commit. Reading only the ids live at the revision would accept such an
+ * id for exactly one commit, then lock the corpus on the next.
  *
  * When git cannot read the corpus here (no git, no commit, no corpus at HEAD)
  * the set degrades to the frozen list alone: no error, and no exit 3 for that
@@ -444,25 +447,35 @@ try {
     errors.push(`--against ${against}: git is not runnable (${(e as Error).message})`);
   }
 }
-const liveAtComparison = new Set<string>();
+const knownAtComparison = new Set<string>();
 if (constAtRev !== null) {
-  for (const id of idsFromConstitutionAtRev(constAtRev)) liveAtComparison.add(id);
+  for (const id of idsFromConstitutionAtRev(constAtRev)) knownAtComparison.add(id);
 }
 if (enfAtRev !== null) {
   const atRev = readCorpus(enfAtRev);
   if (atRev.hasMap) {
     for (const e of atRev.entries) {
       const em = asMap(e);
-      if (em !== null && typeof em.law === "string") liveAtComparison.add(em.law);
+      if (em === null) continue;
+      if (typeof em.law === "string") knownAtComparison.add(em.law);
+      if (Array.isArray(em.absorbs)) {
+        for (const a of em.absorbs) {
+          if (typeof a === "string") knownAtComparison.add(a);
+        }
+      }
     }
     for (const e of atRev.judging) {
       const em = asMap(e);
-      if (em !== null && typeof em.id === "string") liveAtComparison.add(em.id);
+      if (em !== null && typeof em.id === "string") knownAtComparison.add(em.id);
+    }
+    for (const e of atRev.retired) {
+      const em = asMap(e);
+      if (em !== null && typeof em.id === "string") knownAtComparison.add(em.id);
     }
   }
 }
 const knownOldIds = new Set<string>(Object.keys(OLD_IDS));
-for (const id of liveAtComparison) knownOldIds.add(id);
+for (const id of knownAtComparison) knownOldIds.add(id);
 
 const handleOwner = new Map<string, string>();
 const handleById = new Map<string, string>();

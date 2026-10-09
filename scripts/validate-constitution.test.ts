@@ -1,10 +1,14 @@
-#!/usr/bin/env -S deno run --allow-write=/tmp --allow-run=deno,git --allow-env
+#!/usr/bin/env -S deno run --allow-write=/tmp --allow-run=deno,git,sh --allow-env
 const TREE_ROOT = new URL("../", import.meta.url).pathname;
 const CONFIG = new URL("../deno.json", import.meta.url).pathname;
 const VALIDATOR_ARG = Deno.env.get("VALIDATOR_PATH") ?? "scripts/validate-constitution.ts";
 const VALIDATOR = VALIDATOR_ARG.startsWith("/")
   ? VALIDATOR_ARG
   : new URL(VALIDATOR_ARG, `file://${TREE_ROOT}`).pathname;
+const HOOK_ARG = Deno.env.get("HOOK_PATH") ?? ".husky/pre-commit";
+const HOOK = HOOK_ARG.startsWith("/")
+  ? HOOK_ARG
+  : new URL(HOOK_ARG, `file://${TREE_ROOT}`).pathname;
 
 // Deno refuses to hand a subprocess any LD_*/DYLD_* variable, and giving a spawn
 // an explicit `env` needs unscoped `--allow-run`. Stripping those names from this
@@ -121,6 +125,39 @@ async function runGit(cwd: string, args: string[]): Promise<void> {
   if (!o.success) {
     throw new Error(`git ${args.join(" ")} failed: ${decode(o.stderr)}`);
   }
+}
+
+async function runHook(cwd: string): Promise<Result> {
+  const cmd = new Deno.Command("sh", {
+    args: [HOOK],
+    cwd,
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const o = await cmd.output();
+  return { code: o.code, out: decode(o.stdout) + decode(o.stderr) };
+}
+
+/**
+ * A temp repo's `deno.json`. `test` drives the real validator on the corpus so
+ * the hook has the corpus gate to run; `test:validator` is a stub that always
+ * passes, so the pre-fix hook (whose exit status is its last line) can mask a
+ * failing `test` — which is the defect under test. The stub is reachable, so
+ * the valid-corpus control asserts a real 0.
+ */
+function hookDenoJson(): string {
+  return `${JSON.stringify({
+    tasks: {
+      "test":
+        `deno run --quiet --allow-read=CONSTITUTION.md,ENFORCEMENT.md --allow-run=git --config=${CONFIG} ${VALIDATOR}`,
+      "test:validator": `deno eval "Deno.exit(0)"`,
+    },
+  }, null, 2)}\n`;
+}
+
+async function commitAll(dir: string, message: string): Promise<void> {
+  await runGit(dir, ["add", "-A"]);
+  await runGit(dir, ["commit", "-qm", message]);
 }
 
 async function withCorpus(
@@ -446,6 +483,28 @@ const ENF_ABSORBS_G2 = ENFORCEMENT.replace(
   "absorbs: [CONST-B1, CONST-B2]",
   "absorbs: [CONST-B1, CONST-B2, CONST-G2]",
 );
+const ENF_G2_ENTRY = ENFORCEMENT.replace(
+  "judging:\n",
+  `  - law: CONST-G2
+    handle: FRESH-GOVERNANCE
+    absorbs: []
+    checks:
+      - question: "Is the freshly minted law covered?"
+        criteria: "It is."
+    mechanism: [review]
+    severity: P0
+    waiver: "None."
+    incidents: ${INCIDENTS}
+judging:
+`,
+);
+
+function assertOk(result: Result, label: string): void {
+  assert(
+    result.code === 0,
+    `${label}: expected exit 0, got ${result.code}; output: ${result.out}`,
+  );
+}
 
 test("#fix1a: an id live at the comparison revision may be retired, with and without --against", async () => {
   assert(CONSTITUTION_WITH_G2.includes("CONST-G2"), "fixture edit failed");
@@ -502,6 +561,85 @@ test("#fix1c: a fabricated id is rejected with and without --against", async () 
       "retired id 'CONST-G2' is not a known old id",
     );
   });
+});
+
+test("#fix1d: an id minted and then retired across two commits stays accepted", async () => {
+  await withCorpus({ constitution: CONSTITUTION_WITH_G2, enforcement: ENF_G2_ENTRY }, async (dir) => {
+    await runGit(dir, ["init", "-q"]);
+
+    // Commit 1: G2 is minted and live.
+    assertOk(await runValidator(dir), "mint");
+    await commitAll(dir, "mint CONST-G2");
+
+    // Commit 2: G2 is removed from the law text and retired.
+    await Deno.writeTextFile(`${dir}/CONSTITUTION.md`, CONSTITUTION);
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, ENF_RETIRED_G2);
+    assertOk(await runValidator(dir), "retire, HEAD still holds G2 live");
+    await commitAll(dir, "retire CONST-G2");
+
+    // Commit 3: an unrelated edit. HEAD now holds G2 retired, not live.
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, `${ENF_RETIRED_G2}\nUnrelated prose.\n`);
+    await commitAll(dir, "unrelated edit");
+
+    assertOk(await runValidator(dir), "no flag, G2 retired at HEAD");
+    assertOk(await runValidator(dir, ["--against", "HEAD"]), "--against HEAD, G2 retired at HEAD");
+  });
+});
+
+test("#fix1e: an id minted and then absorbed across two commits stays accepted", async () => {
+  await withCorpus({ constitution: CONSTITUTION_WITH_G2, enforcement: ENF_G2_ENTRY }, async (dir) => {
+    await runGit(dir, ["init", "-q"]);
+
+    // Commit 1: G2 is minted and live.
+    assertOk(await runValidator(dir), "mint");
+    await commitAll(dir, "mint CONST-G2");
+
+    // Commit 2: G2 is removed from the law text and absorbed into CONST-G1.
+    await Deno.writeTextFile(`${dir}/CONSTITUTION.md`, CONSTITUTION);
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, ENF_ABSORBS_G2);
+    assertOk(await runValidator(dir), "absorb, HEAD still holds G2 live");
+    await commitAll(dir, "absorb CONST-G2");
+
+    // Commit 3: an unrelated edit. HEAD now holds G2 absorbed, not live.
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, `${ENF_ABSORBS_G2}\nUnrelated prose.\n`);
+    await commitAll(dir, "unrelated edit");
+
+    assertOk(await runValidator(dir), "no flag, G2 absorbed at HEAD");
+    assertOk(await runValidator(dir, ["--against", "HEAD"]), "--against HEAD, G2 absorbed at HEAD");
+  });
+});
+
+test("#hook: the pre-commit hook fails when deno task test fails", async () => {
+  const dir = await Deno.makeTempDir({ dir: "/tmp", prefix: "constitution-hook-" });
+  try {
+    const dangling = ENFORCEMENT.replace(
+      "Doctrine prose. Gates fail commands, not clauses.",
+      "Doctrine prose. CONST-Q42 governs the gate.",
+    );
+    assert(dangling !== ENFORCEMENT, "fixture edit failed");
+    await Deno.writeTextFile(`${dir}/CONSTITUTION.md`, CONSTITUTION);
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, dangling);
+    await Deno.writeTextFile(`${dir}/deno.json`, hookDenoJson());
+    await runGit(dir, ["init", "-q"]);
+    await commitAll(dir, "dangling corpus");
+
+    // The dangling citation fails `deno task test`; the hook must not mask it.
+    const red = await runHook(dir);
+    assert(
+      red.code !== 0,
+      `expected the hook to exit non-zero on a dangling corpus, got ${red.code}; output: ${red.out}`,
+    );
+
+    // Control: a valid corpus, with test:validator reachable, must exit 0.
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, ENFORCEMENT);
+    const control = await runHook(dir);
+    assert(
+      control.code === 0,
+      `expected the hook to exit 0 on a valid corpus, got ${control.code}; output: ${control.out}`,
+    );
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
 });
 
 test("#fix2: --against resolves a corpus vendored in a subdirectory", async () => {
