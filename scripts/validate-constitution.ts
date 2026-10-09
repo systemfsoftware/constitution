@@ -39,8 +39,8 @@ const PATHS = [CONSTITUTION, ENFORCEMENT] as const;
 const LAW_ID_RE = /^CONST-[A-Z]\d+$/;
 const HANDLE_RE = /^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$/;
 const CITE_RE = /\bCONST-[A-Z]\d+\b/g;
-const RAW_LAW_ID_RE = /^\s*-\s*id:\s*CONST-[A-Z]\d+\s*$/;
-const RAW_CORPUS_ID_RE = /^\s*-\s*(?:law|id):\s*CONST-[A-Z]\d+\s*$/;
+const RAW_LAW_ID_RE = /^\s*-\s*id:\s*["']?CONST-[A-Z]\d+["']?\s*$/;
+const RAW_CORPUS_ID_RE = /^\s*-\s*(?:law|id):\s*["']?CONST-[A-Z]\d+["']?\s*$/;
 
 const MAX_WORDS = 1800;
 const LADDER = ["type", "command", "refusal", "review"];
@@ -184,9 +184,9 @@ function familyOf(id: string): string {
 }
 
 const DEF_LINE_RES: RegExp[] = [
-  /^\s*-\s*id:\s*CONST-[A-Z]\d+/,
-  /^\s*-\s*law:\s*CONST-[A-Z]\d+/,
-  /^\s*-\s*CONST-[A-Z]\d+\s*$/,
+  /^\s*-\s*id:\s*["']?CONST-[A-Z]\d+/,
+  /^\s*-\s*law:\s*["']?CONST-[A-Z]\d+/,
+  /^\s*-\s*["']?CONST-[A-Z]\d+["']?\s*$/,
   /^\s*absorbs:\s*\[/,
 ];
 
@@ -421,6 +421,49 @@ const corpus: Corpus = {
   retiredIds: [],
 };
 
+/**
+ * The comparison revision for lineage acceptance: `--against <rev>`, or `HEAD`
+ * when there is no flag. An absorbed or retired id is accepted when it is on
+ * the frozen pre-rewrite list or was live at this revision — the rule the
+ * lineage contract already prescribes for ids minted after the rewrite.
+ *
+ * When git cannot read the corpus here (no git, no commit, no corpus at HEAD)
+ * the set degrades to the frozen list alone: no error, and no exit 3 for that
+ * fallback by itself.
+ */
+const comparisonRev = against ?? "HEAD";
+let constAtRev: string | null = null;
+let enfAtRev: string | null = null;
+try {
+  [constAtRev, enfAtRev] = await Promise.all([
+    gitShow(comparisonRev, CONSTITUTION),
+    gitShow(comparisonRev, ENFORCEMENT),
+  ]);
+} catch (e) {
+  if (against !== undefined) {
+    errors.push(`--against ${against}: git is not runnable (${(e as Error).message})`);
+  }
+}
+const liveAtComparison = new Set<string>();
+if (constAtRev !== null) {
+  for (const id of idsFromConstitutionAtRev(constAtRev)) liveAtComparison.add(id);
+}
+if (enfAtRev !== null) {
+  const atRev = readCorpus(enfAtRev);
+  if (atRev.hasMap) {
+    for (const e of atRev.entries) {
+      const em = asMap(e);
+      if (em !== null && typeof em.law === "string") liveAtComparison.add(em.law);
+    }
+    for (const e of atRev.judging) {
+      const em = asMap(e);
+      if (em !== null && typeof em.id === "string") liveAtComparison.add(em.id);
+    }
+  }
+}
+const knownOldIds = new Set<string>(Object.keys(OLD_IDS));
+for (const id of liveAtComparison) knownOldIds.add(id);
+
 const handleOwner = new Map<string, string>();
 const handleById = new Map<string, string>();
 function registerHandle(id: string, rawHandle: unknown): void {
@@ -472,7 +515,7 @@ for (let i = 0; i < corpus.entries.length; i++) {
           errors.push(
             `${label}: absorbed id '${x}' has family '${familyOf(x)}' which is not registered — known families are [${KNOWN_FAMILIES}]`,
           );
-        } else if (!Object.hasOwn(OLD_IDS, x)) {
+        } else if (!knownOldIds.has(x)) {
           errors.push(`${label}: absorbed id '${x}' is not a known old id`);
         } else {
           corpus.absorbedIds.push(x);
@@ -577,7 +620,7 @@ for (let i = 0; i < corpus.retired.length; i++) {
     errors.push(`${label}: 'reason' must be a non-empty string`);
   }
   if (typeof rawId === "string") {
-    if (!Object.hasOwn(OLD_IDS, rawId)) {
+    if (!knownOldIds.has(rawId)) {
       errors.push(`${label}: retired id '${rawId}' is not a known old id`);
     } else {
       corpus.retiredIds.push(rawId);
@@ -664,7 +707,14 @@ function idsFromConstitutionAtRev(text: string): string[] {
 
 async function gitShow(rev: string, path: string): Promise<string | null> {
   const cmd = new Deno.Command("git", {
-    args: ["show", `${rev}:${path}`],
+    // `<rev>:./<path>` resolves `<path>` from this process's directory, so a
+    // corpus vendored in a subdirectory of its repo compares correctly.
+    args: ["show", `${rev}:./${path}`],
+    cwd: Deno.cwd(),
+    // Spawning with an explicit env needs unscoped `--allow-run`; clearing the
+    // child env is the one route that keeps the run permission scoped, and it
+    // drops any LD_*/DYLD_* variable Deno refuses to pass along.
+    clearEnv: true,
     stdout: "piped",
     stderr: "piped",
   });
@@ -674,17 +724,6 @@ async function gitShow(rev: string, path: string): Promise<string | null> {
 }
 
 if (against !== undefined) {
-  let constAtRev: string | null = null;
-  let enfAtRev: string | null = null;
-  try {
-    [constAtRev, enfAtRev] = await Promise.all([
-      gitShow(against, CONSTITUTION),
-      gitShow(against, ENFORCEMENT),
-    ]);
-  } catch (e) {
-    errors.push(`--against ${against}: git is not runnable (${(e as Error).message})`);
-  }
-
   if (constAtRev === null) uncompared.push(CONSTITUTION);
   if (enfAtRev === null) uncompared.push(ENFORCEMENT);
 

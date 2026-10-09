@@ -1,10 +1,18 @@
-#!/usr/bin/env -S deno run --allow-write=/tmp --allow-run=deno,git --allow-env=VALIDATOR_PATH
+#!/usr/bin/env -S deno run --allow-write=/tmp --allow-run=deno,git --allow-env
 const TREE_ROOT = new URL("../", import.meta.url).pathname;
 const CONFIG = new URL("../deno.json", import.meta.url).pathname;
 const VALIDATOR_ARG = Deno.env.get("VALIDATOR_PATH") ?? "scripts/validate-constitution.ts";
 const VALIDATOR = VALIDATOR_ARG.startsWith("/")
   ? VALIDATOR_ARG
   : new URL(VALIDATOR_ARG, `file://${TREE_ROOT}`).pathname;
+
+// Deno refuses to hand a subprocess any LD_*/DYLD_* variable, and giving a spawn
+// an explicit `env` needs unscoped `--allow-run`. Stripping those names from this
+// process's environment once is the one route that leaves `--allow-run` scoped;
+// every spawn below, and the validator it launches, then inherits a clean env.
+for (const name of Object.keys(Deno.env.toObject())) {
+  if (name.startsWith("LD_") || name.startsWith("DYLD_")) Deno.env.delete(name);
+}
 
 const CONSTITUTION = `# Constitution
 
@@ -92,6 +100,8 @@ async function runValidator(cwd: string, args: string[] = []): Promise<Result> {
       ...args,
     ],
     cwd,
+    // Keep this child's env: it needs PATH to resolve the validator's own git
+    // spawn. LD_*/DYLD_* were already stripped from this process above.
     stdout: "piped",
     stderr: "piped",
   });
@@ -103,6 +113,7 @@ async function runGit(cwd: string, args: string[]): Promise<void> {
   const cmd = new Deno.Command("git", {
     args: ["-c", "user.email=test@example.com", "-c", "user.name=test", "-c", "commit.gpgsign=false", ...args],
     cwd,
+    clearEnv: true,
     stdout: "piped",
     stderr: "piped",
   });
@@ -413,6 +424,186 @@ test("#item8: a law entry with a single incident is rejected", async () => {
   assert(oneIncident !== ENFORCEMENT, "fixture edit failed");
   await withCorpus({ enforcement: oneIncident }, async (dir) => {
     assertFailsWith(await runValidator(dir), "fewer than two incidents");
+  });
+});
+
+const G2_LAW = `
+\`\`\`yaml
+- id: CONST-G2
+  law: A freshly minted governance law.
+  why: The lineage can retire what it just created.
+  example:
+    wrong: "Keep it forever."
+    right: "Retire it, with a reason."
+\`\`\`
+`;
+const CONSTITUTION_WITH_G2 = `${CONSTITUTION}${G2_LAW}`;
+const ENF_RETIRED_G2 = ENFORCEMENT.replace(
+  '  - id: CONST-E7\n    reason: "Folded into CONST-G1."\n',
+  '  - id: CONST-E7\n    reason: "Folded into CONST-G1."\n  - id: CONST-G2\n    reason: "Retired the same day."\n',
+);
+const ENF_ABSORBS_G2 = ENFORCEMENT.replace(
+  "absorbs: [CONST-B1, CONST-B2]",
+  "absorbs: [CONST-B1, CONST-B2, CONST-G2]",
+);
+
+test("#fix1a: an id live at the comparison revision may be retired, with and without --against", async () => {
+  assert(CONSTITUTION_WITH_G2.includes("CONST-G2"), "fixture edit failed");
+  assert(ENF_RETIRED_G2 !== ENFORCEMENT, "fixture edit failed");
+  await withCorpus({ constitution: CONSTITUTION_WITH_G2, enforcement: ENFORCEMENT }, async (dir) => {
+    await runGit(dir, ["init", "-q"]);
+    await runGit(dir, ["add", "-A"]);
+    await runGit(dir, ["commit", "-qm", "rev"]);
+    await runGit(dir, ["tag", "rev"]);
+
+    await Deno.writeTextFile(`${dir}/CONSTITUTION.md`, CONSTITUTION);
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, ENF_RETIRED_G2);
+
+    const noFlag = await runValidator(dir);
+    assert(noFlag.code === 0, `no-flag expected exit 0, got ${noFlag.code}; output: ${noFlag.out}`);
+    const against = await runValidator(dir, ["--against", "rev"]);
+    assert(against.code === 0, `--against expected exit 0, got ${against.code}; output: ${against.out}`);
+  });
+});
+
+test("#fix1b: an id live at the comparison revision may be absorbed, with and without --against", async () => {
+  assert(ENF_ABSORBS_G2 !== ENFORCEMENT, "fixture edit failed");
+  await withCorpus({ constitution: CONSTITUTION_WITH_G2, enforcement: ENFORCEMENT }, async (dir) => {
+    await runGit(dir, ["init", "-q"]);
+    await runGit(dir, ["add", "-A"]);
+    await runGit(dir, ["commit", "-qm", "rev"]);
+    await runGit(dir, ["tag", "rev"]);
+
+    await Deno.writeTextFile(`${dir}/CONSTITUTION.md`, CONSTITUTION);
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, ENF_ABSORBS_G2);
+
+    const noFlag = await runValidator(dir);
+    assert(noFlag.code === 0, `no-flag expected exit 0, got ${noFlag.code}; output: ${noFlag.out}`);
+    const against = await runValidator(dir, ["--against", "rev"]);
+    assert(against.code === 0, `--against expected exit 0, got ${against.code}; output: ${against.out}`);
+  });
+});
+
+test("#fix1c: a fabricated id is rejected with and without --against", async () => {
+  await withCorpus({ constitution: CONSTITUTION, enforcement: ENFORCEMENT }, async (dir) => {
+    await runGit(dir, ["init", "-q"]);
+    await runGit(dir, ["add", "-A"]);
+    await runGit(dir, ["commit", "-qm", "rev"]);
+    await runGit(dir, ["tag", "rev"]);
+
+    await Deno.writeTextFile(`${dir}/ENFORCEMENT.md`, ENF_RETIRED_G2);
+
+    assertFailsWith(
+      await runValidator(dir),
+      "retired id 'CONST-G2' is not a known old id",
+    );
+    assertFailsWith(
+      await runValidator(dir, ["--against", "rev"]),
+      "retired id 'CONST-G2' is not a known old id",
+    );
+  });
+});
+
+test("#fix2: --against resolves a corpus vendored in a subdirectory", async () => {
+  const root = await Deno.makeTempDir({ dir: "/tmp", prefix: "constitution-nested-" });
+  try {
+    const nested = `${root}/vendor/constitution`;
+    await Deno.mkdir(nested, { recursive: true });
+    await Deno.writeTextFile(`${nested}/CONSTITUTION.md`, CONSTITUTION);
+    await Deno.writeTextFile(`${nested}/ENFORCEMENT.md`, ENFORCEMENT);
+    await runGit(root, ["init", "-q"]);
+    await runGit(root, ["add", "-A"]);
+    await runGit(root, ["commit", "-qm", "rev"]);
+    await runGit(root, ["tag", "rev"]);
+
+    const r = await runValidator(nested, ["--against", "rev"]);
+    assert(r.code === 0, `expected exit 0, got ${r.code}; output: ${r.out}`);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+test("#fix5: a quoted id in an unmeasured fence escapes the raw-vs-parsed coverage count", async () => {
+  // The fence info string carries a space, so `extractBlocks` never sees the
+  // block and its law is silently unmeasured. Pre-fix the raw count missed the
+  // quoted id too, so the coverage check stayed silent and the defect passed.
+  const misFenced = `${CONSTITUTION}
+\`\`\` yaml
+- id: "CONST-G1"
+  law: A shadowed copy the fence never measures.
+  why: The fence info string carries a space.
+  example:
+    wrong: "Trust a slightly different fence."
+    right: "Use exactly three backticks and yaml."
+\`\`\`
+`;
+  await withCorpus({ constitution: misFenced, enforcement: ENFORCEMENT }, async (dir) => {
+    assertFailsWith(
+      await runValidator(dir),
+      "law id(s) declared in the raw text but only",
+    );
+  });
+});
+
+test("#4a: a duplicate handle is rejected", async () => {
+  const dup = ENFORCEMENT.replace("handle: GATE-FAILS-COMMAND", "handle: LEGIBLE-LAW");
+  assert(dup !== ENFORCEMENT, "fixture edit failed");
+  await withCorpus({ enforcement: dup }, async (dir) => {
+    assertFailsWith(await runValidator(dir), "handle 'LEGIBLE-LAW' is not unique");
+  });
+});
+
+test("#4b: a law with no enforcement entry is rejected", async () => {
+  await withCorpus({ constitution: CONSTITUTION_WITH_G2, enforcement: ENFORCEMENT }, async (dir) => {
+    assertFailsWith(await runValidator(dir), "law CONST-G2: no enforcement entry");
+  });
+});
+
+test("#4c: a law with two enforcement entries is rejected", async () => {
+  const extra = `  - law: CONST-G1
+    handle: SECOND-G1-HANDLE
+    absorbs: []
+    checks:
+      - question: "Is the law legible twice?"
+        criteria: "It is not."
+    mechanism: [review]
+    severity: P0
+    waiver: "None."
+    incidents: ${INCIDENTS}
+`;
+  const two = ENFORCEMENT.replace("judging:\n", `${extra}judging:\n`);
+  assert(two !== ENFORCEMENT, "fixture edit failed");
+  await withCorpus({ enforcement: two }, async (dir) => {
+    assertFailsWith(await runValidator(dir), "law CONST-G1: 2 enforcement entries");
+  });
+});
+
+test("#4d: a dangling citation to an invented id is rejected", async () => {
+  const cited = ENFORCEMENT.replace(
+    "Doctrine prose. Gates fail commands, not clauses.",
+    "Doctrine prose. CONST-G9 governs the gate.",
+  );
+  assert(cited !== ENFORCEMENT, "fixture edit failed");
+  await withCorpus({ enforcement: cited }, async (dir) => {
+    assertFailsWith(await runValidator(dir), "dangling citation: 'CONST-G9'");
+  });
+});
+
+test("#4e: an id on a definition line is not counted as a citation", async () => {
+  const defLines = ENFORCEMENT.replace(
+    "## Corpus",
+    `Prose that defines, not cites:
+- id: CONST-Q1
+- law: CONST-Q2
+- CONST-Q3
+absorbs: [CONST-Q4]
+
+## Corpus`,
+  );
+  assert(defLines !== ENFORCEMENT, "fixture edit failed");
+  await withCorpus({ enforcement: defLines }, async (dir) => {
+    const r = await runValidator(dir);
+    assert(r.code === 0, `expected exit 0, got ${r.code}; output: ${r.out}`);
   });
 });
 
