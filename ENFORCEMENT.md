@@ -170,7 +170,7 @@ laws:
       - "systemfsoftware/systemfsoftware 3488c2eb2:packages/core/effect/daemon-spec/AGENTS.md:49 (2026-09-03, #348, fix b89b52d46). A leaf carried a gate command copied by paraphrase from another file rather than re-derived, and the copy named the wrong task."
   - law: CONST-S4
     handle: SUBTRACT-FIRST
-    absorbs: [CONST-S3]
+    absorbs: []
     checks:
       - question: "Was removal tried before addition?"
         criteria: "Duplicates are unified, bad states made unrepresentable, a branch deleted instead of guarded. Extending a copy-paste cluster, adding a helper where removing or unifying one does the job, or patching around a rotten core fails. Taste is not rot: \"rotten\" names the invariant the core breaks."
@@ -289,6 +289,8 @@ retired:
     reason: "Obligation removed: no failure was found where a bare primitive stood in for a domain value, and a law stands only on two failure incidents."
   - id: CONST-W2
     reason: "Obligation removed: no failure was found where a large or irreversible choice went unchallenged, and a law stands only on two failure incidents."
+  - id: CONST-S3
+    reason: "Obligation removed: cut at gate 3, where a blind review found both failure incidents back only \"model only what a known requirement needs\", never \"define the outside contract first\". Its guidance stays as technique checks under SUBTRACT-FIRST (CONST-S4)."
   - id: CONST-W3
     reason: "Obligation removed: one failure incident only, and a law stands on two. The reviewer-side waiver for a declared breach stays in P0-VERDICT (CONST-G3)."
 ```
