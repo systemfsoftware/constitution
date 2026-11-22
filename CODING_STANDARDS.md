@@ -22,8 +22,9 @@ back unnoticed.
   only its own fields; keep a plain nullable only for a value that is absent the
   same way in every state. Outside data becomes a domain type only through a
   decode that returns a typed result, never through a cast or a suppression
-  comment. Where a program in an untyped language reads outside data, it
-  validates that data at the boundary with a schema that fails.
+  comment, except the assertion `SF-IMP-4` names. Where a program in an untyped
+  language reads outside data, it validates that data at the boundary with a
+  schema that fails.
   - Why: a value the type could have refused reaches runtime, and every check
     downstream trusts it.
   - Wrong: a lock helper took a lock spec and a nullable adapter, so a spec that
@@ -32,11 +33,17 @@ back unnoticed.
     impossible to construct.
 - **SF-IMP-3** In typed code, give every failure a caller handles differently
   its own tagged variant, so callers can branch on the real failure.
-- **SF-IMP-4** The compiler is the evidence for such a fix. Wire the wrong state
-  once on purpose, paste the compiler error into the PR body, and revert the
-  wiring. Never commit that wiring as a test.
-  - Why: the type error holds on every future build; a test proves one case once
-    and costs a run every time.
+- **SF-IMP-4** The compiler is the evidence for such a fix. Commit one
+  type-level assertion of the refused state, beside the type, in a file only the
+  type checker reads: a single `@ts-expect-error` line, or the repository's
+  existing type-assertion tool. The line is otherwise valid, so the refused
+  state is the only error it can raise. Write one per state the change closes,
+  none for a state no change has closed, and delete it with the type. Add no
+  runner or dependency for it, and never write it as a runtime test. Where the
+  language has no such assertion, paste the compiler error into the PR body
+  instead.
+  - Why: a pasted error proves one moment and nobody can check it; a committed
+    assertion costs no run and fails when the state becomes constructable again.
 - **SF-IMP-5** Never write or propose an integration, end-to-end or microVM test
   for an invariant a type can hold: make the type hold it (`SF-IMP-1`). Runtime
   tests are for what the compiler cannot prove: a decode of outside data, a
@@ -138,8 +145,9 @@ thresholds, rubrics. A change that builds or edits one also reads `GRADERS.md`.
   add to a grader (a threshold, budget, glob, baseline, lint config, workflow,
   rubric, a `CODING_STANDARDS.md` or `REVIEW.md`, or a timeout a test or CI step
   runs under) so that in-flight work passes. A timeout a program waits on a
-  network, database or peer at run time is not a grader. The one exception is
-  the owner's order, quoted in the PR body.
+  network, database or peer at run time is not a grader. When the owner orders a
+  grader changed or turned off, that is a change whose task is the grader: make
+  it in its own PR, holding nothing else.
   - Why: whoever edits the grader reports the score they chose.
 
 ## Maintaining this file

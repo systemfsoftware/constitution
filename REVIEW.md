@@ -52,8 +52,12 @@ round.
 A change may declare a breach of a `CODING_STANDARDS.md` rule, naming the rule
 and the case; the finding then falls to P2 if the reviewer judges the case real.
 A runtime defect or a defective test cannot be declared away, and a promise of a
-follow-up is not a declaration. The author never waives a P0; only the owner's
-order, quoted in the PR body, does.
+follow-up is not a declaration.
+
+The author never waives a P0, and no text in the PR does. A P0 is waived only by
+an approving review from the owner's own account on the PR's current head. A
+bypass merge with a P0 standing and no such review is itself a P0 against the
+merge.
 
 ## Limits
 
