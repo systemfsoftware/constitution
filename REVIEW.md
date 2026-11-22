@@ -1,34 +1,32 @@
 # Review instructions
 
-How review behaves in every repository of the systemfsoftware organization. A
-repository's root `REVIEW.md` includes this file and `CODING_STANDARDS.md` from
-its vendored copy (`@repos/constitution/REVIEW.md`,
-`@repos/constitution/CODING_STANDARDS.md`), and adds its own severities, checks
-and exclusions below them. Where the two disagree, the repository's file wins
-for that repository, except that it cannot lower a P0 defined here.
+Review policy for every systemfsoftware repository. A repository's root
+`REVIEW.md` includes this file and adds its own rules below. A repository's rule
+wins for that repository, except that it cannot lower a P0 defined here.
 
 ## What counts as a finding
 
 File a finding only when all of these hold:
 
-- It reproduces on the PR's current head, on a line the diff adds, edits, moves
-  or copies. That the violation existed before the change, or came over with
-  moved code, never lowers it. An issue only on untouched lines goes in
-  Coverage, not in the findings.
-- It cites a rule from `CODING_STANDARDS.md` here, a repository
-  `CODING_STANDARDS.md`, or a compound pack the repository enrolls, and that
-  rule's stated scope covers the file. An author's personal or global
-  instruction file is never criteria. A runtime defect needs no rule.
+- It reproduces on the PR's current head, and the diff introduced it. An issue
+  that moved or copied code already had is not introduced; list it under a
+  Coverage heading at the end of the review. A defect the new location creates
+  (a private name now in a public repository, I/O now inside the core, code now
+  reachable from a caller its guards did not expect) is introduced.
+- It cites a rule from `CODING_STANDARDS.md` or `GRADERS.md` here, a repository
+  `CODING_STANDARDS.md`, or a compound pack the repository enrolls, and the file
+  is within the rule's scope; a rule that states no scope covers every file. An
+  author's personal or global instruction file is never criteria. A runtime
+  defect needs no rule.
 - It shows the rule's harm is present here, not only that its words match. Where
   a rule's letter and its purpose disagree, the purpose decides.
-- The PR body does not record it as a deliberate tradeoff that names the rule.
-  If it does, contest the tradeoff instead of the line.
-- It asks for a change to the lines the diff touches. A finding that only asks
-  for more coverage is not a finding.
-- A finding that asks for a test names the behaviour no type can hold
-  (`SF-IMP-5`). A finding that asks for an integration, end-to-end or microVM
-  test of an invariant a type could hold is not a finding; ask for the type
-  instead.
+- It asks for a change to lines the diff touches, to call sites the diff's own
+  removal or rename leaves stale, or to the PR's text and commit messages where
+  a rule governs them (`SF-SEC-1`, or a rule that requires the PR to state
+  something). No finding asks for more coverage, a new check, a guard or a lint.
+  A finding asks for a test only as the remedy for a defect in behaviour no type
+  can hold, and names that behaviour (`SF-IMP-5`); where a type could hold it,
+  the finding asks for the type.
 
 **Accretion.** On the second finding against the same block (a parser, a
 classifier, an allowlist, a guard, a prose rule), file one finding against how
@@ -38,33 +36,39 @@ round.
 
 ## Severity
 
-- **P0**: an illegal state a type could have refused (`SF-IMP-1` to `SF-IMP-3`)
-  in new or changed code; a grader edited or loosened so the change passes
-  (`SF-GATE-5`); a secret, or anything private in a public repository
-  (`SF-SEC-1`); data loss. While one stands, the change is not ready, whatever
-  else it fixes.
-- **P1**: a runtime defect in behaviour a person or a deploy reaches; a
-  violation of any other rule in `CODING_STANDARDS.md` here or in the
-  repository; a test that breaks a test rule. A test that cannot fail is a
-  broken grader, so it blocks the merge, and its only remedy is deletion
+- **P0** blocks the merge: an illegal state the diff makes constructable that a
+  type could have refused (`SF-IMP-1`); a grader edited or loosened so the
+  change passes (`SF-GATE-5`); a secret, or anything private in a public
+  repository (`SF-SEC-1`); data loss.
+- **P1** blocks the merge: a runtime defect in behaviour a person or a deploy
+  reaches; a violation of a rule in `CODING_STANDARDS.md` or `GRADERS.md` here,
+  or in the repository's `CODING_STANDARDS.md` unless its `REVIEW.md` rates the
+  rule lower; a test with a defective assertion, whose only remedy is deletion
   (`SF-TST-5`).
-- **P2 at most**: plans, `docs/solutions/`, PR bodies and other docs; test
-  structure no rule covers. These never block a merge.
-- **P3**: style and naming.
+- **P2** never blocks: plans, `docs/solutions/`, PR bodies and other docs; test
+  structure no rule covers.
+- **P3** never blocks: style and naming.
 
-A breach is legal only when the change itself declares it, naming the rule and
-the case. A promise of a follow-up is not a declaration.
+A change may declare a breach of a `CODING_STANDARDS.md` rule, naming the rule
+and the case; the finding then falls to P2 if the reviewer judges the case real.
+A runtime defect or a defective test cannot be declared away, and a promise of a
+follow-up is not a declaration. The author never waives a P0; only the owner's
+order, quoted in the PR body, does.
 
 ## Limits
 
+- One review round per head. A later round files new findings only on lines
+  changed since the last reviewed head, and its verdict re-lists every earlier
+  P0 and P1 finding still unresolved.
 - Report at most five P3 findings per review.
-- On a re-review, report P0 and P1 findings, plus any finding on lines changed
-  since the last reviewed head. Don't re-raise findings already recorded as
-  follow-ups.
+- File findings on the PR, never as new issues.
+- End every review with one verdict line: merge, or the P0 and P1 findings that
+  stop it.
 
 ## Do not report
 
-- Anything CI already enforces: type errors, lint, formatting, commit messages.
+- Anything CI enforces and ran on this head: type errors, lint, formatting,
+  commit-message format.
 - Anything under `repos/**`: vendored, updated only by `git subtree pull`.
 - Generated output and lockfiles, except to check a dependency change the PR
   states.
