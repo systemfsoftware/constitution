@@ -1,7 +1,7 @@
 name: CI
 
 # One job on every pull request, with no path filter, so the required `check` is emitted for every change, docs-only
-# ones included. It runs the same two validators as the pre-commit hook.
+# ones included. It runs the same check as the pre-commit hook.
 on:
   push:
     branches: [main]
@@ -27,7 +27,5 @@ jobs:
       - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
         with:
           deno-version: v2.x
-      - name: Validate the constitution
-        run: deno task test
-      - name: Validator tests
-        run: deno task test:validator
+      - name: Check markdown formatting
+        run: deno task check
