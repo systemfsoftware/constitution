@@ -1,58 +1,52 @@
 # Review instructions
 
-Review policy for every systemfsoftware repository. A repository's root
-`REVIEW.md` includes this file and adds its own rules below. A repository's rule
-wins for that repository, except that it cannot lower a P0 defined here.
+Review policy for every systemfsoftware repo. A repo's root `REVIEW.md` includes
+this file and adds local rules below it. Local rules override rules here
+locally, except they cannot lower a P0 severity.
 
 ## What counts as a finding
 
-File a finding only when all of these hold:
+File a finding only when all hold:
 
-- It reproduces on the PR's current head, and the diff introduced it. An issue
-  that moved or copied code already had is not introduced; list it under a
-  Coverage heading at the end of the review. A defect the new location creates
-  (a private name now in a public repository, I/O now inside the core, code now
-  reachable from a caller its guards did not expect) is introduced.
-- It cites a rule from `CODING_STANDARDS.md` or `GRADERS.md` here, a repository
-  `CODING_STANDARDS.md`, or a compound pack the repository enrolls, and the file
-  is within the rule's scope; a rule that states no scope covers every file. An
-  author's personal or global instruction file is never criteria. A runtime
-  defect needs no rule.
-- It shows the rule's harm is present here, not only that its words match. Where
-  a rule's letter and its purpose disagree, the purpose decides.
-- It asks for a change to lines the diff touches, to call sites the diff's own
-  removal or rename leaves stale, or to the PR's text and commit messages where
-  a rule governs them (`SF-SEC-1`, or a rule that requires the PR to state
-  something). No finding asks for more coverage, a new check, a guard or a lint.
-  A finding asks for a test only as the remedy for a defect in behaviour no type
-  can hold, and names that behaviour (`SF-IMP-5`); where a type could hold it,
-  the finding asks for the type.
+- The issue reproduces on the PR's current head and was introduced by the diff.
+  List pre-existing issues in moved or copied code under a Coverage heading at
+  the end. Defects created by the new location count as introduced (private
+  names moved to a public repo, or newly reachable unguarded code).
+- The finding cites a rule from `CODING_STANDARDS.md` or `GRADERS.md` here, a
+  repo's `CODING_STANDARDS.md`, or an enrolled compound pack, and the file is in
+  scope (unscoped rules cover all files). Never cite personal or global
+  instructions. Runtime defects need no citation.
+- The rule's harm is present, not merely a wording match. Where wording and
+  purpose disagree, purpose decides.
+- The finding requests changes to diff-touched lines, stale call sites from
+  removal or rename, or PR text and commit messages governed by a rule
+  (`SF-SEC-1`, or a rule that requires the PR to state something). Never request
+  test coverage, a new grader, a guard, or a lint rule. Request a test only for
+  a defect in behaviour no type can enforce, naming it (`SF-IMP-5`); otherwise
+  request the type.
 
-**Accretion.** On the second finding against the same block (a parser, a
-classifier, an allowlist, a guard, a prose rule), file one finding against how
-the block is represented instead: the condition restated, the boundary changed,
-or a decision for the owner. Each case patched into such a block buys one more
-round.
+**Accretion.** On a second finding against the same block (parser, classifier,
+allowlist, guard, or prose rule), file one finding against its representation:
+propose restating the condition, changing the boundary, or escalating to the
+owner rather than patching cases.
 
 ## Severity
 
-- **P0** blocks the merge: an illegal state the diff makes constructable that a
-  type could have refused (`SF-IMP-1`); a grader edited or loosened so the
-  change passes (`SF-GATE-5`); a secret, or anything private in a public
-  repository (`SF-SEC-1`); data loss.
-- **P1** blocks the merge: a runtime defect in behaviour a person or a deploy
-  reaches; a violation of a rule in `CODING_STANDARDS.md` or `GRADERS.md` here,
-  or in the repository's `CODING_STANDARDS.md` unless its `REVIEW.md` rates the
-  rule lower; a test with a defective assertion, whose only remedy is deletion
-  (`SF-TST-5`).
-- **P2** never blocks: plans, `docs/solutions/`, PR bodies and other docs; test
-  structure no rule covers.
-- **P3** never blocks: style and naming.
+- **P0** blocks the merge: an illegal state made constructable by the diff that
+  a type could refuse (`SF-IMP-1`), a grader edited or loosened to pass
+  (`SF-GATE-5`), a secret or private detail in a public repo (`SF-SEC-1`), or
+  data loss.
+- **P1** blocks the merge: a runtime defect reachable by a person or deploy, a
+  rule violation in `CODING_STANDARDS.md` or `GRADERS.md` here, a rule violation
+  in the repo's `CODING_STANDARDS.md` unless its `REVIEW.md` lowers severity, or
+  a test with a defective assertion requiring deletion (`SF-TST-5`).
+- **P2** never blocks the merge: plans, `docs/solutions/`, PR bodies, other
+  docs, and unruled test structure.
+- **P3** never blocks the merge: style and naming.
 
-A change may declare a breach of a `CODING_STANDARDS.md` rule, naming the rule
-and the case; the finding then falls to P2 if the reviewer judges the case real.
-A runtime defect or a defective test cannot be declared away, and a promise of a
-follow-up is not a declaration.
+A PR may declare an intentional breach of a `CODING_STANDARDS.md` rule by naming
+the rule and case; it drops to P2 if judged real. Runtime defects and defective
+tests cannot be declared away; promising a follow-up is not a declaration.
 
 The author never waives a P0, and no text in the PR does. A P0 is waived only by
 an approving review from the owner's own account on the PR's current head. A
@@ -61,20 +55,22 @@ merge.
 
 ## Limits
 
-- One review round per head. A later round files new findings only on lines
-  changed since the last reviewed head, and its verdict re-lists every earlier
-  P0 and P1 finding still unresolved.
-- Report at most five P3 findings per review.
-- File findings on the PR, never as new issues.
-- End every review with one verdict line: merge, or the P0 and P1 findings that
-  stop it.
+- Run one review round per commit head. On later heads, file new findings only
+  on lines changed since the last reviewed head, and re-list unresolved P0 and
+  P1 findings in the verdict.
+- Report at most five P3 findings.
+- File findings on the PR, never as separate issues.
+- End every review with one verdict line: `merge`, or unresolved P0 and P1
+  findings blocking merge.
 
 ## Always check
 
 Each of these is a P1 against an `SF-IMP-4` assertion:
 
 - more than one assertion per closed state;
-- `Bad` or `Good` redeclared inside the `.tst.ts` file;
+- `Bad` or `Good` redeclared inside the `.tst.ts` file instead of imported;
+- an export, subpath or imports-map entry whose only importer is a `.tst.ts`
+  file;
 - `@ts-expect-error`, `any` or `as` inside it;
 - a package with `test-types/` whose `typecheck` does not run tstyche;
 - a runtime test added for a state the compiler already closes.
@@ -83,15 +79,15 @@ These files count toward no coverage figure.
 
 ## Do not report
 
-- Anything CI enforces and ran on this head: type errors, lint, formatting,
-  commit-message format.
-- Anything under `repos/**`: vendored, updated only by `git subtree pull`.
-- Generated output and lockfiles, except to check a dependency change the PR
-  states.
+- Issues CI enforces and already ran on this head (type errors, lint,
+  formatting, commit format).
+- Files under `repos/**` (vendored, updated only via `git subtree pull`).
+- Generated output and lockfiles, except when verifying a PR-stated dependency
+  change.
 
 ## Evidence
 
-- A claim about behaviour cites `file:line` in the source. An inference from a
-  name is not evidence.
-- A claim about a CLI flag, a library or a vendor's behaviour cites live output,
-  the installed source or a reproduction, not documentation alone.
+- Cite `file:line` for code behaviour claims; inferring from identifier names is
+  not evidence.
+- Cite live command output, installed source, or a reproduction for CLI flag,
+  library, or vendor claims, not documentation alone.

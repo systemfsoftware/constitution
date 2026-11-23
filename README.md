@@ -2,50 +2,68 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue?style=flat-square)](LICENSE)
 
-The shared coding standards and review policy for System F Software. Every
-repository in the organization vendors this one and is reviewed against the same
-rules.
+This repository holds an organization's shared coding standards and review
+policy. Every repository in the organization vendors it with `git subtree` so
+that engineers and review tools check changes against the same rules.
+
+Keeping these files in one place gives every project a common baseline for
+writing code, reviewing changes, building automated checks, and guiding coding
+agents.
 
 ## What is here
 
-| File                                       | Read it when                                                                                                                |
-| :----------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
-| [CODING_STANDARDS.md](CODING_STANDARDS.md) | You plan, write, review or propose a test for code in any organization repository. It leads with "Impossible states first". |
-| [REVIEW.md](REVIEW.md)                     | You review a change or answer review findings: the finding bar, severities and evidence.                                    |
-| [GRADERS.md](GRADERS.md)                   | You build or change a check: a lint rule, CI job, hook, threshold or rubric.                                                |
-| [WORKING.md](WORKING.md)                   | Always: every repository imports it into its always-on `AGENTS.md` or `CLAUDE.md`.                                          |
-| [`docs/solutions/`](docs/solutions)        | You want the past problem behind a rule.                                                                                    |
+| File                                       | Read it when                                                                                                                                               |
+| :----------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [CODING_STANDARDS.md](CODING_STANDARDS.md) | You plan, write, review, or propose a test for code in any organization repository. It holds the review criteria and leads with "Impossible states first". |
+| [REVIEW.md](REVIEW.md)                     | You review a change or respond to review findings. It defines the review policy, including the finding bar, severities, and evidence.                      |
+| [GRADERS.md](GRADERS.md)                   | You build or change an automated check, such as a lint rule, CI job, hook, threshold, or rubric.                                                           |
+| [WORKING.md](WORKING.md)                   | Always. It describes how agents work, and every repository imports it into its always-on `AGENTS.md` or `CLAUDE.md`.                                       |
+| [`docs/solutions/`](docs/solutions)        | You want to read the past problem behind a rule.                                                                                                           |
 
-The files follow the `CODING_STANDARDS.md` and `REVIEW.md` model of the
-[Compound Engineering plugin](https://github.com/EveryInc/compound-engineering-plugin):
-`ce-code-review` and Claude Code Review read them as criteria and review policy.
+These files follow the `CODING_STANDARDS.md` and `REVIEW.md` model from the
+[Compound Engineering plugin](https://github.com/EveryInc/compound-engineering-plugin).
+Both `ce-code-review` and Claude Code Review read them directly as review
+criteria and review policy.
 
-## Use it in a repository
+## How to adopt it
 
-1. Vendor this repository with `git subtree` at `repos/constitution/`.
-2. In the repository's root `REVIEW.md`, include both files, each on its own
-   line:
+1. Vendor this repository into your project at `repos/constitution/` using
+   `git subtree`.
+2. Add both shared files to your repository's root `REVIEW.md`, each on a line
+   of its own:
 
-   ```markdown
-   @repos/constitution/CODING_STANDARDS.md @repos/constitution/REVIEW.md
+   ```text
+   @repos/constitution/CODING_STANDARDS.md
+   @repos/constitution/REVIEW.md
    ```
 
-3. Keep the repository's own rules in its own `CODING_STANDARDS.md` and
-   `REVIEW.md`. A repository with no rules of its own may symlink its root
+3. Keep repository-specific rules in your own root `CODING_STANDARDS.md` and
+   `REVIEW.md`. If your repository has no rules of its own, symlink its root
    `CODING_STANDARDS.md` to `repos/constitution/CODING_STANDARDS.md`.
-4. Route agents to the standards and review files from the repository's
-   `AGENTS.md` under the trigger "you plan, write, review or propose a test",
-   and to `GRADERS.md` under "you build or change a check". Do not `@`-import
-   those into an always-loaded file.
-5. `@`-import `repos/constitution/WORKING.md` into the always-on `AGENTS.md` or
-   `CLAUDE.md`, on a line of its own.
+4. Route agents to the shared files from your repository's `AGENTS.md`. Point
+   them to `CODING_STANDARDS.md` and `REVIEW.md` under the trigger "you plan,
+   write, review or propose a test", and to `GRADERS.md` under "you build or
+   change a check". Do not `@`-import those files into an always-loaded file.
+5. Import `repos/constitution/WORKING.md` into your always-on `AGENTS.md` or
+   `CLAUDE.md` on a line of its own:
 
-A repository with its own root `CODING_STANDARDS.md` receives the organization's
-rules through the `REVIEW.md` include: review tools find standards files by
-placement, so the vendored copy otherwise governs only `repos/constitution/`.
+   ```text
+   @repos/constitution/WORKING.md
+   ```
 
-Update the vendored copy with
-`git subtree pull --prefix repos/constitution https://github.com/systemfsoftware/constitution main --squash`.
+> [!NOTE]
+> If a repository has its own root `CODING_STANDARDS.md`, it still receives the
+> organization's rules through the `REVIEW.md` include. Review tools locate
+> standards files by placement, so the vendored copy in `repos/constitution/`
+> otherwise governs only `repos/constitution/`.
+
+## Update the vendored copy
+
+Pull the latest rules into a repository that already vendors them:
+
+```bash
+git subtree pull --prefix repos/constitution https://github.com/systemfsoftware/constitution main --squash
+```
 
 ## Contributing
 
