@@ -22,9 +22,8 @@ back unnoticed.
   only its own fields; keep a plain nullable only for a value that is absent the
   same way in every state. Outside data becomes a domain type only through a
   decode that returns a typed result, never through a cast or a suppression
-  comment, except the assertion `SF-IMP-4` names. Where a program in an untyped
-  language reads outside data, it validates that data at the boundary with a
-  schema that fails.
+  comment. Where a program in an untyped language reads outside data, it
+  validates that data at the boundary with a schema that fails.
   - Why: a value the type could have refused reaches runtime, and every check
     downstream trusts it.
   - Wrong: a lock helper took a lock spec and a nullable adapter, so a spec that
@@ -33,17 +32,18 @@ back unnoticed.
     impossible to construct.
 - **SF-IMP-3** In typed code, give every failure a caller handles differently
   its own tagged variant, so callers can branch on the real failure.
-- **SF-IMP-4** The compiler is the evidence for such a fix. Commit one
-  type-level assertion of the refused state, beside the type, in a file only the
-  type checker reads: a single `@ts-expect-error` line, or the repository's
-  existing type-assertion tool. The line is otherwise valid, so the refused
-  state is the only error it can raise. Write one per state the change closes,
-  none for a state no change has closed, and delete it with the type. Add no
-  runner or dependency for it, and never write it as a runtime test. Where the
-  language has no such assertion, paste the compiler error into the PR body
-  instead.
-  - Why: a pasted error proves one moment and nobody can check it; a committed
-    assertion costs no run and fails when the state becomes constructable again.
+- **SF-IMP-4** The compiler is the evidence for such a fix. Commit one tstyche
+  assertion that the refused state is refused, in the package's `test-types/`,
+  run by its `typecheck` script (`tsc -b && tstyche`) and never by its tests.
+  Use `expect<Bad>().type.not.toBeAssignableTo<Good>()` (or
+  `not.toBeAssignableFrom`); use `toRaiseError` only where no assignability pair
+  expresses the refusal (an overload, an inference failure, a missing service),
+  and always with the expected message. Import both types from the package's own
+  exports. Write one per state the change closes, and delete it with the type.
+  Where the language has no such tool, paste the compiler error into the PR
+  body.
+  - Why: it costs no test run, fails when the state becomes constructable again,
+    and passes for that reason only.
 - **SF-IMP-5** Never write or propose an integration, end-to-end or microVM test
   for an invariant a type can hold: make the type hold it (`SF-IMP-1`). Runtime
   tests are for what the compiler cannot prove: a decode of outside data, a

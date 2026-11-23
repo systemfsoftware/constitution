@@ -69,6 +69,18 @@ merge.
 - End every review with one verdict line: merge, or the P0 and P1 findings that
   stop it.
 
+## Always check
+
+Each of these is a P1 against an `SF-IMP-4` assertion:
+
+- more than one assertion per closed state;
+- `Bad` or `Good` redeclared inside the `.tst.ts` file;
+- `@ts-expect-error`, `any` or `as` inside it;
+- a package with `test-types/` whose `typecheck` does not run tstyche;
+- a runtime test added for a state the compiler already closes.
+
+These files count toward no coverage figure.
+
 ## Do not report
 
 - Anything CI enforces and ran on this head: type errors, lint, formatting,
