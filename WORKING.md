@@ -8,8 +8,6 @@ narrow these rules, never loosen them.
   queue, or blocked by something only the owner holds, and state which applies.
 - **SF-WRK-2** Do reversible work without asking. Send any design or technical
   decision you would ask the owner to Gemini, report its answer, and proceed.
-- **SF-WRK-3** Never spawn subagents unless explicitly requested by the owner in
-  the current task.
 - **SF-WRK-4** Never run full test suites, end-to-end tests, or microVM runs on
   shared hosts; leave them to CI.
 - **SF-WRK-5** Before any destructive or broad action, restate the instruction's
